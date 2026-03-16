@@ -1,8 +1,10 @@
 import openai
+import os
+from dotenv import load_dotenv
 
-openai.api_key = "sk-"
+load_dotenv()
 
-client = openai.OpenAI(api_key="sk-")
+client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 try:
     response = client.chat.completions.create(
