@@ -1,8 +1,8 @@
 import openai
 
-openai.api_key = "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"
+openai.api_key = "sk-"
 
-client = openai.OpenAI(api_key="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")
+client = openai.OpenAI(api_key="sk-")
 
 try:
     response = client.chat.completions.create(
