@@ -39,6 +39,45 @@ body {
     padding: 16px;
 }
 
+.welcome-card {
+    max-width: 520px;
+    margin: 48px auto;
+    background: #ffffff;
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+}
+
+.welcome-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cta-link {
+    display: inline-block;
+    background: #0077cc;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 4px;
+}
+
+.cta-link:hover {
+    background: #005fa3;
+}
+
+.cta-link.secondary {
+    background: #2f855a;
+}
+
+.cta-link.secondary:hover {
+    background: #276749;
+}
+
 h1, h2 {
     color: #333;
 }

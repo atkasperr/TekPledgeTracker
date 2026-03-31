@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (res.ok) {
 				alert('Sign up successful — check your email to confirm account if required');
 				form.reset();
-				window.location.href = '/';
+				window.location.href = '/home';
 			} else {
 				const msg = (body && body.message) || JSON.stringify(body) || 'Profile creation failed';
 				alert('Error creating profile: ' + msg + ' (see console)');

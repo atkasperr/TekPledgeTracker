@@ -40,11 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 
 	logoutBtn?.addEventListener('click', async () => {
+		const shouldLogout = window.confirm('Are you sure you want to log out?');
+		if (!shouldLogout) return;
+
 		const { error } = await supabaseClient.auth.signOut();
 		if (error) {
 			alert('Logout failed: ' + (error.message || JSON.stringify(error)));
 			return;
 		}
-		window.location.href = '/login';
+		window.location.href = '/';
 	});
 });
