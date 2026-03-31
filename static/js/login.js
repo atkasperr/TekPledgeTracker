@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				return alert('Login failed: ' + (error.message || JSON.stringify(error)));
 			}
 			// on success redirect
-			window.location.href = '/';
+			window.location.href = '/home';
 		} catch (err) {
 			console.error('Login network/error', err);
 			alert('Login error: ' + (err.message || err));

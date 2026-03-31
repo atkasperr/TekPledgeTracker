@@ -27,17 +27,22 @@ def inject_supabase_config():
 
 @app.route('/')
 def landing():
-    return render_template('landing.html')
+    return render_template('landing.html', hide_navbar=True)
 
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('login.html', hide_navbar=True)
 
 
 @app.route('/signup')
 def signup():
-    return render_template('signup.html')
+    return render_template('signup.html', hide_navbar=True)
+
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 
 @app.route('/coffee-chats')
