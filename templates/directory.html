@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Directory</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Directory{% endblock %}
+
+{% block content %}
     <h2>TEK Directory</h2>
     <div id="directory-list">
         <!-- Directory will be loaded here -->
     </div>
+{% endblock %}
+
+{% block scripts %}
     <script src="/static/js/directory.js"></script>
-</body>
-</html>
+{% endblock %}

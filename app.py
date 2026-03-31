@@ -17,6 +17,14 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
+@app.context_processor
+def inject_supabase_config():
+    return {
+        'supabase_url': SUPABASE_URL,
+        'supabase_key': SUPABASE_KEY
+    }
+
+
 @app.route('/')
 def landing():
     return render_template('landing.html')
@@ -111,16 +119,83 @@ def api_pledges():
         return jsonify(data)
     else:
         payload = request.json or {}
+
+        # Only allow columns that the signup form sends.
+        # This avoids Supabase/PostgREST errors when extra keys (like `role`) aren't present in the table schema.
+        allowed_fields = {'uniquename', 'name', 'email', 'phone', 'year', 'major', 'pc'}
+        payload = {k: v for k, v in payload.items() if k in allowed_fields}
+
+        # Normalize empty strings and trim whitespace.
+        for k, v in list(payload.items()):
+            if isinstance(v, str):
+                v = v.strip()
+                payload[k] = v if v else None
+
         # require uniquename
         uniq = payload.get('uniquename')
         if not uniq:
             return jsonify({'status': 'error', 'message': 'uniquename is required'}), 400
+
+        # Normalize year to integer if present.
+        if payload.get('year') is not None:
+            try:
+                payload['year'] = int(payload['year'])
+            except (TypeError, ValueError):
+                return jsonify({'status': 'error', 'message': 'year must be a number'}), 400
+
         try:
             res = supabase.table('pledges').insert(payload).execute()
             data = getattr(res, 'data', res)
             return jsonify({'status': 'success', 'data': data}), 201
         except APIError as e:
-            return jsonify({'status': 'error', 'message': str(e)}), 400
+            return jsonify({
+                'status': 'error',
+                'message': str(e),
+                'payload_keys': list(payload.keys())
+            }), 400
+
+
+@app.route('/api/brothers', methods=['GET', 'POST'])
+def api_brothers():
+    if request.method == 'GET':
+        res = supabase.table('brothers').select('*').execute()
+        data = getattr(res, 'data', res)
+        return jsonify(data)
+    else:
+        payload = request.json or {}
+
+        # Only allow columns that the signup form sends.
+        allowed_fields = {'uniquename', 'name', 'email', 'phone', 'year', 'major', 'pc'}
+        payload = {k: v for k, v in payload.items() if k in allowed_fields}
+
+        # Normalize empty strings and trim whitespace.
+        for k, v in list(payload.items()):
+            if isinstance(v, str):
+                v = v.strip()
+                payload[k] = v if v else None
+
+        # require uniquename
+        uniq = payload.get('uniquename')
+        if not uniq:
+            return jsonify({'status': 'error', 'message': 'uniquename is required'}), 400
+
+        # Normalize year to integer if present.
+        if payload.get('year') is not None:
+            try:
+                payload['year'] = int(payload['year'])
+            except (TypeError, ValueError):
+                return jsonify({'status': 'error', 'message': 'year must be a number'}), 400
+
+        try:
+            res = supabase.table('brothers').insert(payload).execute()
+            data = getattr(res, 'data', res)
+            return jsonify({'status': 'success', 'data': data}), 201
+        except APIError as e:
+            return jsonify({
+                'status': 'error',
+                'message': str(e),
+                'payload_keys': list(payload.keys())
+            }), 400
 
 
 if __name__ == '__main__':

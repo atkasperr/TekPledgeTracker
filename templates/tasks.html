@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Tasks</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
     <h2>Tasks</h2>
     <div id="tasks-list">
         <!-- Tasks will be loaded here -->
@@ -14,6 +11,8 @@
         <input type="text" placeholder="Task Name" required><br>
         <button type="submit">Submit Task</button>
     </form>
+{% endblock %}
+
+{% block scripts %}
     <script src="/static/js/tasks.js"></script>
-</body>
-</html>
+{% endblock %}

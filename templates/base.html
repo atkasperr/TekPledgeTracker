@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TEK Pledge Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <header class="top-nav">
+        <nav class="top-nav-links">
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+            <a href="/coffee-chats">Coffee Chats</a>
+            <a href="/directory">Directory</a>
+            <a href="/tasks">Tasks</a>
+            <a href="/calendar">Calendar</a>
+        </nav>
+        <div id="auth-status" class="auth-status">Not logged in</div>
+        <button id="logout-btn" class="logout-btn" type="button" style="display: none;">Logout</button>
+    </header>
+
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script id="supabase-config" type="application/json">
+        {
+            "SUPABASE_URL": {{ supabase_url | tojson }},
+            "SUPABASE_KEY": {{ supabase_key | tojson }}
+        }
+    </script>
+    <script>
+        const CONFIG = JSON.parse(document.getElementById('supabase-config').textContent);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="/static/js/navbar.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

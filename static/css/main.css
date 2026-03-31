@@ -4,10 +4,45 @@ body {
     padding: 0;
     background: #f5f5f5;
 }
+
+.top-nav {
+    background: #ffffff;
+    border-bottom: 1px solid #d6d6d6;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.top-nav-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.auth-status {
+    margin-left: auto;
+    color: #333;
+    font-size: 14px;
+}
+
+.logout-btn {
+    background: #e74c3c;
+}
+
+.logout-btn:hover {
+    background: #c63f31;
+}
+
+.page-content {
+    padding: 16px;
+}
+
 h1, h2 {
     color: #333;
 }
-nav a {
+.top-nav a {
     margin: 0 10px;
     text-decoration: none;
     color: #0077cc;
