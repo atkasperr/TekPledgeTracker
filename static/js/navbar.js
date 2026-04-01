@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
 	const authStatusEl = document.getElementById('auth-status');
 	const logoutBtn = document.getElementById('logout-btn');
+	const loginLink = document.getElementById('login-link');
+	const signupLink = document.getElementById('signup-link');
 
 	const hasSupabase = typeof supabase !== 'undefined';
 	const hasConfig = typeof CONFIG !== 'undefined' && CONFIG && CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY;
@@ -16,9 +18,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (user) {
 			authStatusEl.textContent = `Logged in: ${user.email || user.id}`;
 			logoutBtn.style.display = 'inline-block';
+			if (loginLink) loginLink.style.display = 'none';
+			if (signupLink) signupLink.style.display = 'none';
 		} else {
 			authStatusEl.textContent = 'Not logged in';
 			logoutBtn.style.display = 'none';
+			if (loginLink) loginLink.style.display = 'inline';
+			if (signupLink) signupLink.style.display = 'inline';
 		}
 	}
 

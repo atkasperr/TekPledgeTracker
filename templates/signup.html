@@ -3,23 +3,44 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-    <h2>Sign Up</h2>
-    <form id="signup-form">
-        <label for="role">Account type:</label>
-        <select name="role" id="role">
-            <option value="pledge" selected>Pledge</option>
-            <option value="brother">Brother</option>
-        </select><br>
-        <input type="text" name="uniquename" placeholder="Unique username" required><br>
-        <input type="text" name="name" placeholder="Full name"><br>
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Password (not stored)" required><br>
-        <input type="text" name="phone" placeholder="Phone"><br>
-        <input type="number" name="year" placeholder="Year"><br>
-        <input type="text" name="major" placeholder="Major"><br>
-        <input type="text" name="pc" placeholder="PC"><br>
-        <button type="submit">Sign Up</button>
-    </form>
+    <section class="auth-card auth-card-wide">
+        <h2>Create Your Account</h2>
+        <p class="auth-subtitle">Sign up to get started with TEK Pledge Tracker.</p>
+        <form id="signup-form" class="auth-form">
+            <label for="role">Account type</label>
+            <select name="role" id="role">
+                <option value="pledge" selected>Pledge</option>
+                <option value="brother">Brother</option>
+            </select>
+
+            <label for="uniquename">Unique username</label>
+            <input id="uniquename" type="text" name="uniquename" placeholder="e.g. jsmith24" required>
+
+            <label for="name">Full name</label>
+            <input id="name" type="text" name="name" placeholder="John Smith">
+
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" placeholder="you@example.com" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Password (not stored)" required>
+
+            <label for="phone">Phone</label>
+            <input id="phone" type="text" name="phone" placeholder="(555) 123-4567">
+
+            <label for="year">Year</label>
+            <input id="year" type="number" name="year" placeholder="2026">
+
+            <label for="major">Major</label>
+            <input id="major" type="text" name="major" placeholder="Computer Science">
+
+            <label for="pc">PC</label>
+            <input id="pc" type="text" name="pc" placeholder="PC name">
+
+            <button type="submit" class="auth-submit">Sign Up</button>
+        </form>
+        <p class="auth-footer-text">Already have an account? <a href="/login">Log in</a></p>
+    </section>
 {% endblock %}
 
 {% block scripts %}
