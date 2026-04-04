@@ -3,7 +3,10 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-    <section class="auth-card auth-card-wide">
+<div class="circuit-bg-page">
+    <canvas id="circuit-canvas" class="circuit-bg-canvas" aria-hidden="true"></canvas>
+    <div class="circuit-bg-content">
+    <section class="auth-card auth-card-wide auth-card--on-circuit">
         <h2>Create Your Account</h2>
         <p class="auth-subtitle">Sign up to get started with TEK Pledge Tracker.</p>
         <form id="signup-form" class="auth-form">
@@ -41,8 +44,11 @@
         </form>
         <p class="auth-footer-text">Already have an account? <a href="/login">Log in</a></p>
     </section>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+    <script src="/static/js/circuit-background.js"></script>
     <script src="/static/js/signup.js"></script>
 {% endblock %}

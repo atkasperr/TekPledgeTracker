@@ -3,8 +3,17 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <section class="welcome-card">
+<div class="circuit-bg-page circuit-bg-page--with-nav">
+    <canvas id="circuit-canvas" class="circuit-bg-canvas" aria-hidden="true"></canvas>
+    <div class="circuit-bg-content">
+    <section class="welcome-card welcome-card--on-circuit">
         <h1>Welcome to TEK Pledge Tracker</h1>
         <p>You are signed in. Use the navigation bar to access app features.</p>
     </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/static/js/circuit-background.js"></script>
 {% endblock %}

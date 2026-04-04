@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from dotenv import load_dotenv
 from supabase import create_client
 from postgrest.exceptions import APIError
@@ -26,8 +26,8 @@ def inject_supabase_config():
 
 
 @app.route('/')
-def landing():
-    return render_template('landing.html', hide_navbar=True)
+def index():
+    return redirect(url_for('login'))
 
 
 @app.route('/login')
