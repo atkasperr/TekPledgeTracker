@@ -3,6 +3,31 @@ document.addEventListener('DOMContentLoaded', () => {
 	const supabaseClient = typeof supabase !== 'undefined' && CONFIG ? supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY) : null;
 
 	const form = document.getElementById('login-form');
+	const forgotBtn = document.getElementById('forgot-password-btn');
+	const emailInput = document.getElementById('login-email');
+
+	forgotBtn.addEventListener('click', async () => {
+		const email = (emailInput.value || '').trim();
+		if (!email) {
+			alert('Enter your email address above, then click Forgot password again.');
+			emailInput.focus();
+			return;
+		}
+		try {
+			if (!supabaseClient) throw new Error('Supabase client not initialized (check config.js and CDN)');
+			const redirectTo = `${window.location.origin}/reset-password`;
+			const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+			if (error) {
+				console.error('Password reset request error', error);
+				return alert('Could not send reset email: ' + (error.message || JSON.stringify(error)));
+			}
+			alert('If an account exists for that email, you will receive password reset instructions shortly.');
+		} catch (err) {
+			console.error('Forgot password error', err);
+			alert('Error: ' + (err.message || err));
+		}
+	});
+
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		const fd = new FormData(form);

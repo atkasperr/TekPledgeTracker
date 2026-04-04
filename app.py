@@ -40,6 +40,11 @@ def signup():
     return render_template('signup.html', hide_navbar=True)
 
 
+@app.route('/reset-password')
+def reset_password_page():
+    return render_template('reset_password.html', hide_navbar=True)
+
+
 @app.route('/home')
 def home():
     return render_template('home.html')

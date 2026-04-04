@@ -110,6 +110,38 @@ body {
     font-weight: 600;
 }
 
+.auth-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.auth-label-row label {
+    margin: 0;
+}
+
+.auth-card .auth-inline-link-btn {
+    margin: 0;
+    width: auto;
+    padding: 0;
+    background: transparent;
+    color: #0077cc;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.auth-card .auth-inline-link-btn:hover {
+    text-decoration: underline;
+}
+
 .auth-form input,
 .auth-form select {
     width: 100%;
