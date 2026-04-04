@@ -112,7 +112,26 @@
 		let cw = 0;
 		let ch = 0;
 		let raf = 0;
+		let mouseX = -9999;
+		let mouseY = -9999;
+		let hasMouse = false;
+		const GLOW_RADIUS = 140;
 		const reduced = prefersReducedMotion();
+
+		function clamp(v, a, b) {
+			return Math.max(a, Math.min(b, v));
+		}
+
+		function pointToSegmentDistance(px, py, s) {
+			const x1 = s.x1, y1 = s.y1, x2 = s.x2, y2 = s.y2;
+			const dx = x2 - x1;
+			const dy = y2 - y1;
+			if (dx === 0 && dy === 0) return Math.hypot(px - x1, py - y1);
+			const t = clamp(((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy), 0, 1);
+			const projx = x1 + t * dx;
+			const projy = y1 + t * dy;
+			return Math.hypot(px - projx, py - projy);
+		}
 
 		function resize() {
 			dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -167,6 +186,32 @@
 					ctx.stroke();
 				}
 			}
+
+				// Mouse-proximate glow: overlay a soft stroke on segments near the pointer
+				if (hasMouse && !reduced) {
+					for (const wire of wires) {
+						for (const s of wire.segs) {
+							const d = pointToSegmentDistance(mouseX, mouseY, s);
+							const t = clamp(1 - d / GLOW_RADIUS, 0, 1);
+							if (t > 0.02) {
+								// soft outer glow
+								ctx.strokeStyle = `rgba(110,240,255,${0.12 * t})`;
+								ctx.lineWidth = 10 * t;
+								ctx.beginPath();
+								ctx.moveTo(s.x1, s.y1);
+								ctx.lineTo(s.x2, s.y2);
+								ctx.stroke();
+								// brighter core
+								ctx.strokeStyle = `rgba(110,240,255,${0.45 * t})`;
+								ctx.lineWidth = 1.2;
+								ctx.beginPath();
+								ctx.moveTo(s.x1, s.y1);
+								ctx.lineTo(s.x2, s.y2);
+								ctx.stroke();
+							}
+						}
+					}
+				}
 			// Small pads at segment corners (subtle)
 			ctx.fillStyle = COLORS.junction;
 			for (const wire of wires) {
@@ -259,6 +304,35 @@
 			ctx.fillStyle = 'rgba(2, 6, 12, 0.35)';
 			ctx.fillRect(0, 0, cw, ch);
 
+			// Draw mouse radial glow and post-dark wire highlights so they remain vivid
+			if (hasMouse && !reduced) {
+				const r = GLOW_RADIUS;
+				const grad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, r);
+				grad.addColorStop(0, 'rgba(110,240,255,0.22)');
+				grad.addColorStop(0.25, 'rgba(110,240,255,0.06)');
+				grad.addColorStop(1, 'rgba(0,0,0,0)');
+				ctx.fillStyle = grad;
+				ctx.beginPath();
+				ctx.arc(mouseX, mouseY, r, 0, Math.PI * 2);
+				ctx.fill();
+
+				// strong wire cores where close to cursor
+				for (const wire of wires) {
+					for (const s of wire.segs) {
+						const d = pointToSegmentDistance(mouseX, mouseY, s);
+						const t = clamp(1 - d / GLOW_RADIUS, 0, 1);
+						if (t > 0.03) {
+							ctx.strokeStyle = `rgba(150,255,255,${0.55 * t})`;
+							ctx.lineWidth = 2.2;
+							ctx.beginPath();
+							ctx.moveTo(s.x1, s.y1);
+							ctx.lineTo(s.x2, s.y2);
+							ctx.stroke();
+						}
+					}
+				}
+			}
+
 			if (!reduced) {
 				raf = requestAnimationFrame(tick);
 			}
@@ -272,6 +346,27 @@
 		}
 
 		resize();
+
+		// Mouse / touch tracking for glow effect
+		if (!reduced) {
+			document.addEventListener('mousemove', (ev) => {
+				mouseX = ev.clientX;
+				mouseY = ev.clientY;
+				hasMouse = true;
+			});
+			document.addEventListener('mouseleave', () => {
+				hasMouse = false;
+			});
+			document.addEventListener('touchmove', (ev) => {
+				const t = ev.touches && ev.touches[0];
+				if (t) {
+					mouseX = t.clientX;
+					mouseY = t.clientY;
+					hasMouse = true;
+				}
+			}, { passive: true });
+			document.addEventListener('touchend', () => { hasMouse = false; });
+		}
 		window.addEventListener('resize', () => {
 			clearTimeout(resize._t);
 			resize._t = setTimeout(() => {

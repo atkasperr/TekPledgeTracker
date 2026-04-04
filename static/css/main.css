@@ -17,16 +17,31 @@ body {
     flex-wrap: wrap;
 }
 
+.top-nav .nav-logo {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.top-nav .nav-logo img {
+    height: 30px;
+    width: auto;
+    display: block;
+    vertical-align: middle;
+}
+
 .top-nav-links {
     display: flex;
     gap: 10px;
+    font-size: 12px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .auth-status {
     margin-left: auto;
-    color: #333;
-    font-size: 14px;
+    color: #000;
+    font-size: 12px;
 }
 
 .logout-btn {
@@ -49,6 +64,23 @@ body {
     border-radius: 8px;
     padding: 24px;
     text-align: center;
+}
+
+/* Homepage large heading (replaces welcome card) */
+.home-heading {
+    max-width: 1100px;
+    margin: 72px auto;
+    text-align: center;
+    padding: 0 16px;
+}
+
+.home-title {
+    color: #ffffff;
+    font-weight: 800;
+    margin: 0;
+    font-size: clamp(28px, 6vw, 72px);
+    letter-spacing: 0.5px;
+    text-shadow: 0 10px 30px rgba(41,55,134,0.35);
 }
 
 .welcome-actions {
@@ -86,6 +118,8 @@ body {
     min-height: calc(100vh - 32px);
     margin: -16px;
     padding: 16px;
+    background: linear-gradient(180deg, #293786 0%, #1f2a6a 100%);
+    color: #eef2ff;
 }
 
 .circuit-bg-page--with-nav {
@@ -125,6 +159,17 @@ body {
     border-radius: 10px;
     padding: 28px;
     box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.auth-logo img {
+    max-width: 160px;
+    height: auto;
+    display: inline-block;
 }
 
 .auth-card-wide {
@@ -232,7 +277,7 @@ h1, h2 {
 .top-nav a {
     margin: 0 10px;
     text-decoration: none;
-    color: #0077cc;
+    color: #000;
 }
 form {
     margin: 20px 0;
