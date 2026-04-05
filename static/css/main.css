@@ -363,3 +363,16 @@ button:hover {
     color: #0f172a;
     font-size: 13px;
 }
+#calendar-view {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+#calendar-view iframe {
+    max-width: 100%;
+}
+
+h2 {
+    text-align: center;
+}
