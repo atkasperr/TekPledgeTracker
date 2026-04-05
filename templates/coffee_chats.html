@@ -5,7 +5,6 @@
 {% block content %}
     <h2>Coffee Chats</h2>
     <form id="coffee-chat-form">
-        <input type="text" name="pledge_uniq" placeholder="Pledge unique name" required><br>
         <input type="text" name="brother_fullname" placeholder="Brother full name" required><br>
         <input type="date" name="chat_date" required><br>
         <textarea name="description" placeholder="Short description"></textarea><br>
@@ -15,6 +14,20 @@
         <p>Chats done: <span id="chats-done">0</span></p>
         <p>Chats needed this week: <span id="chats-week">0</span></p>
         <p>Chats needed this semester: <span id="chats-semester">0</span></p>
+        <div class="progress-block">
+            <label>Progress (out of 35): <span id="progress-35-text">0 / 35</span></label>
+            <div class="progress"><div id="progress-35-fill" class="progress-inner" style="width:0%"></div></div>
+        </div>
+        <div class="progress-block">
+            <label>Progress (out of 4): <span id="progress-4-text">0 / 4</span></label>
+            <div class="progress"><div id="progress-4-fill" class="progress-inner" style="width:0%"></div></div>
+        </div>
+    </div>
+    <div id="recent-chats" class="recent-chats">
+        <h3>Recent Chats</h3>
+        <ul id="recent-chats-list" class="recent-chats-list">
+            <!-- recent items rendered here -->
+        </ul>
     </div>
 {% endblock %}
 

@@ -300,3 +300,66 @@ button {
 button:hover {
     background: #005fa3;
 }
+
+/* Progress bars for coffee chats */
+.progress-block {
+    max-width: 560px;
+    margin: 12px 0;
+}
+.progress {
+    background: #e6eef8;
+    border-radius: 8px;
+    height: 14px;
+    overflow: hidden;
+}
+.progress-inner {
+    height: 100%;
+    background: linear-gradient(90deg,#06b6d4,#0ea5e9);
+    width: 0%;
+    transition: width 300ms ease;
+}
+.progress-block label {
+    display: block;
+    font-size: 13px;
+    color: #223;
+    margin-bottom: 6px;
+}
+
+/* Recent chats list */
+.recent-chats {
+    max-width: 720px;
+    margin-top: 18px;
+    background: #fff;
+    border: 1px solid #e6eef8;
+    padding: 12px;
+    border-radius: 8px;
+}
+.recent-chats-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+.recent-chat-item {
+    padding: 8px 6px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.recent-chat-item:last-child {
+    border-bottom: none;
+}
+.recent-chat-header {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+.recent-chat-header strong {
+    font-size: 14px;
+}
+.recent-chat-header .chat-date {
+    color: #64748b;
+    font-size: 12px;
+}
+.chat-desc {
+    margin-top: 6px;
+    color: #0f172a;
+    font-size: 13px;
+}
