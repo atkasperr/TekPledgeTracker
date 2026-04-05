@@ -300,3 +300,16 @@ button {
 button:hover {
     background: #005fa3;
 }
+#calendar-view {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+#calendar-view iframe {
+    max-width: 100%;
+}
+
+h2 {
+    text-align: center;
+}
