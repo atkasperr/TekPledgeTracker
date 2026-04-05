@@ -418,11 +418,12 @@ button:hover {
 /* Leaderboard styles */
 .leaderboard {
     max-width: 720px;
-    margin-top: 18px;
-    background: #fff;
-    border: 1px solid #e6eef8;
-    padding: 12px;
-    border-radius: 8px;
+    margin: 18px auto;
+    background: #ffffff;
+    border: 1px solid #d6d6d6;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
 }
 .leaderboard-table {
     width: 100%;
@@ -432,15 +433,24 @@ button:hover {
 .leaderboard-table th,
 .leaderboard-table td {
     text-align: left;
-    padding: 8px 6px;
+    padding: 10px 8px;
     border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
 }
 .leaderboard-table thead th {
     font-size: 13px;
-    color: #0f172a;
+    color: #334155;
+    font-weight: 700;
+    text-transform: none;
 }
 .leaderboard-table tbody tr:hover {
-    background: #f8fafc;
+    background: #fafafa;
+}
+.leaderboard-table tbody td:first-child {
+    width: 48px;
+}
+.leaderboard-table tbody td:nth-child(3) {
+    width: 80px;
 }
 .leaderboard-count {
     font-weight: 700;
