@@ -104,6 +104,101 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			}
 
+			chatsWeekEl.textContent = weekCount;
+			chatsSemesterEl.textContent = semCount;
+
+			// build leaderboard across all pledges (counts by pledge_uniq)
+			const leaderboardBody = document.getElementById('leaderboard-body');
+			// create or locate tooltip element (one global)
+			let tooltip = document.getElementById('leaderboard-tooltip');
+			if (!tooltip) {
+				tooltip = document.createElement('div');
+				tooltip.id = 'leaderboard-tooltip';
+				tooltip.className = 'leaderboard-tooltip';
+				document.body.appendChild(tooltip);
+			}
+			if (leaderboardBody) {
+				leaderboardBody.innerHTML = '';
+				const counts = {};
+				const byPledge = {};
+				for (const c of data) {
+					const key = c.pledge_uniq;
+					if (!key) continue;
+					counts[key] = (counts[key] || 0) + 1;
+					byPledge[key] = byPledge[key] || [];
+					byPledge[key].push(c);
+				}
+				const rows = Object.keys(counts).map(k => ({ pledge: k, count: counts[k] }));
+				rows.sort((a, b) => b.count - a.count || a.pledge.localeCompare(b.pledge));
+				let rank = 1;
+				for (const r of rows) {
+					const tr = document.createElement('tr');
+					tr.tabIndex = 0;
+					const tdRank = document.createElement('td');
+					tdRank.textContent = rank++;
+					const tdPledge = document.createElement('td');
+					tdPledge.textContent = r.pledge;
+					const tdCount = document.createElement('td');
+					tdCount.className = 'leaderboard-count';
+					tdCount.textContent = r.count;
+					tr.appendChild(tdRank);
+					tr.appendChild(tdPledge);
+					tr.appendChild(tdCount);
+
+					// hover/focus handlers show tooltip with that pledge's chats
+					const showTooltip = (clientX, clientY, pledgeKey) => {
+						const chats = (byPledge[pledgeKey] || []).slice().sort((a, b) => new Date(b.chat_date || b.date || b.chatDate) - new Date(a.chat_date || a.date || a.chatDate));
+						let html = '';
+						if (chats.length === 0) {
+							html = '<div>No chats</div>';
+						} else {
+							html = '<h4>Recent chats</h4><ul>';
+							for (const c of chats.slice(0, 10)) {
+								const d = c.chat_date || c.date || c.chatDate;
+								const dateText = d ? (' <span class="chat-date">' + new Date(d).toLocaleDateString() + '</span>') : '';
+								const who = (c.brother_fullname || c.brother || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+								const desc = (c.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+								html += '<li><strong>' + who + '</strong>' + dateText + '<div>' + desc + '</div></li>';
+							}
+							html += '</ul>';
+						}
+						tooltip.innerHTML = html;
+						tooltip.style.display = 'block';
+						// position near cursor, but keep inside viewport
+						const pad = 12;
+						requestAnimationFrame(() => {
+							const rectW = tooltip.offsetWidth;
+							const rectH = tooltip.offsetHeight;
+							let x = clientX + pad;
+							let y = clientY + pad;
+							const maxX = window.pageXOffset + window.innerWidth - rectW - 8;
+							const maxY = window.pageYOffset + window.innerHeight - rectH - 8;
+							if (x > maxX) x = Math.max(window.pageXOffset + 8, maxX);
+							if (y > maxY) y = Math.max(window.pageYOffset + 8, maxY);
+							tooltip.style.left = x + 'px';
+							tooltip.style.top = y + 'px';
+						});
+					};
+
+					const hideTooltip = () => { tooltip.style.display = 'none'; };
+
+					tr.addEventListener('mouseenter', (ev) => showTooltip(ev.pageX, ev.pageY, r.pledge));
+					tr.addEventListener('mousemove', (ev) => showTooltip(ev.pageX, ev.pageY, r.pledge));
+					tr.addEventListener('mouseleave', hideTooltip);
+					tr.addEventListener('focus', (ev) => showTooltip(ev.pageX || window.pageXOffset + 80, ev.pageY || window.pageYOffset + 80, r.pledge));
+					tr.addEventListener('blur', hideTooltip);
+
+					leaderboardBody.appendChild(tr);
+				}
+				if (rows.length === 0) {
+					const tr = document.createElement('tr');
+					const td = document.createElement('td');
+					td.setAttribute('colspan', '3');
+					td.textContent = 'No coffee chats yet';
+					tr.appendChild(td);
+					leaderboardBody.appendChild(tr);
+				}
+			}
 		} catch (err) {
 			console.error('Failed to load coffee chats', err);
 		}
