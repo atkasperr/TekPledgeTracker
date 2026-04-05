@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (typeof supabase === 'undefined' || typeof CONFIG === 'undefined') return null;
 		try {
 			const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-			const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
+			const { data: userData } = await supabaseClient.auth.getUser();
 			const user = userData?.user;
 			if (!user || !user.email) return null;
 			const { data: pledgeData, error: pledgeErr } = await supabaseClient
@@ -25,6 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	function setBar(fillId, pctId, count, goal) {
+		const pct = Math.min(100, Math.round((count / goal) * 100));
+		const fill = document.getElementById(fillId);
+		const label = document.getElementById(pctId);
+		if (fill) fill.style.width = pct + '%';
+		if (label) label.textContent = pct + '%';
+		// legacy text elements
+		const text35 = document.getElementById('progress-35-text');
+		const text4 = document.getElementById('progress-4-text');
+		if (text35 && goal === 35) text35.textContent = `${count} / 35`;
+		if (text4 && goal === 4) text4.textContent = `${count} / 4`;
+	}
+
 	async function loadChats() {
 		try {
 			const res = await fetch('/api/coffee-chats');
@@ -34,59 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			const filtered = currentUniq ? data.filter(c => c.pledge_uniq === currentUniq) : [];
 
 			const doneCount = filtered.length || 0;
-			chatsDoneEl.textContent = doneCount;
+			if (chatsDoneEl) chatsDoneEl.textContent = doneCount;
 
-			// update progress bars
-			const fill35 = document.getElementById('progress-35-fill');
-			const text35 = document.getElementById('progress-35-text');
-			const fill4 = document.getElementById('progress-4-fill');
-			const text4 = document.getElementById('progress-4-text');
-			if (fill35 && text35) {
-				const pct35 = Math.min(100, Math.round((doneCount / 35) * 100));
-				fill35.style.width = pct35 + '%';
-				text35.textContent = `${doneCount} / 35`;
-			}
-			if (fill4 && text4) {
-				const pct4 = Math.min(100, Math.round((doneCount / 4) * 100));
-				fill4.style.width = pct4 + '%';
-				text4.textContent = `${doneCount} / 4`;
-			}
-
-			// render recent 3 chats for current user
-			const recentListEl = document.getElementById('recent-chats-list');
-			if (recentListEl) {
-				recentListEl.innerHTML = '';
-				if (!filtered || filtered.length === 0) {
-					const li = document.createElement('li');
-					li.textContent = 'No recent chats';
-					recentListEl.appendChild(li);
-				} else {
-					const sorted = filtered.slice().sort((a, b) => {
-						return new Date(b.chat_date || b.date || b.chatDate) - new Date(a.chat_date || a.date || a.chatDate);
-					});
-					const top = sorted.slice(0, 3);
-					for (const c of top) {
-						const li = document.createElement('li');
-						li.className = 'recent-chat-item';
-						const header = document.createElement('div');
-						header.className = 'recent-chat-header';
-						const name = document.createElement('strong');
-						name.textContent = c.brother_fullname || c.brother || 'Unknown';
-						const dateSpan = document.createElement('span');
-						dateSpan.className = 'chat-date';
-						const dateVal = c.chat_date || c.date || c.chatDate;
-						dateSpan.textContent = dateVal ? (' — ' + new Date(dateVal).toLocaleDateString()) : '';
-						header.appendChild(name);
-						header.appendChild(dateSpan);
-						const desc = document.createElement('div');
-						desc.className = 'chat-desc';
-						desc.textContent = c.description || '';
-						li.appendChild(header);
-						li.appendChild(desc);
-						recentListEl.appendChild(li);
-					}
-				}
-			}
+			setBar('progress-35-fill', 'progress-35-pct', doneCount, 35);
 
 			const now = new Date();
 			const weekAgo = new Date(now);
@@ -98,13 +61,49 @@ document.addEventListener('DOMContentLoaded', () => {
 				const d = new Date(c.chat_date || c.date || c.chatDate);
 				return d >= weekAgo && d <= now;
 			}).length;
+
 			const semCount = filtered.filter(c => {
 				const d = new Date(c.chat_date || c.date || c.chatDate);
 				return d >= semesterAgo && d <= now;
 			}).length;
 
-			chatsWeekEl.textContent = weekCount;
-			chatsSemesterEl.textContent = semCount;
+			if (chatsWeekEl) chatsWeekEl.textContent = weekCount;
+			if (chatsSemesterEl) chatsSemesterEl.textContent = semCount;
+
+			setBar('progress-4-fill', 'progress-4-pct', weekCount, 4);
+
+			// render recent chats
+			const recentListEl = document.getElementById('recent-chats-list');
+			const recentCount = document.getElementById('recent-count');
+			if (recentListEl) {
+				const sorted = filtered.slice().sort((a, b) =>
+					new Date(b.chat_date || b.date || b.chatDate) - new Date(a.chat_date || a.date || a.chatDate)
+				);
+				if (recentCount) recentCount.textContent = sorted.length;
+				if (sorted.length === 0) {
+					recentListEl.innerHTML = '<p class="cc-no-chats">No chats logged yet.</p>';
+				} else {
+					recentListEl.innerHTML = sorted.slice(0, 5).map(c => {
+						const dateVal = c.chat_date || c.date || c.chatDate;
+						const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+						const name = c.brother_fullname || c.brother || 'Unknown';
+						const desc = c.description || '';
+						return `
+							<div class="cc-chat-item">
+								<div class="cc-chat-left">
+									<span class="cc-chat-check">✓ COMPLETED</span>
+									<div>
+										<div class="cc-chat-name">${name}</div>
+										${desc ? `<div class="cc-chat-desc">${desc}</div>` : ''}
+									</div>
+								</div>
+								<div class="cc-chat-date">${dateStr}</div>
+							</div>
+						`;
+					}).join('');
+				}
+			}
+
 		} catch (err) {
 			console.error('Failed to load coffee chats', err);
 		}
@@ -115,11 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		const formData = new FormData(form);
 		const payload = {};
 		for (const [k, v] of formData.entries()) payload[k] = v;
-		// If pledge_uniq is not provided in the form, derive it from the logged-in user.
+
 		if (!payload.pledge_uniq && typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined') {
 			try {
 				const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-				const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
+				const { data: userData } = await supabaseClient.auth.getUser();
 				const user = userData?.user;
 				if (user && user.email) {
 					const { data: pledgeData, error: pledgeErr } = await supabaseClient
@@ -128,14 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
 						.eq('email', user.email)
 						.limit(1)
 						.single();
-					if (pledgeErr) {
-						console.warn('Unable to lookup pledge for user', pledgeErr);
-					} else if (pledgeData && pledgeData.uniquename) {
+					if (!pledgeErr && pledgeData?.uniquename) {
 						payload.pledge_uniq = pledgeData.uniquename;
 					}
 				}
 			} catch (err) {
-				console.warn('Error deriving pledge_uniq from current user', err);
+				console.warn('Error deriving pledge_uniq', err);
 			}
 		}
 
@@ -159,6 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.error('Error submitting chat', err);
 		}
 	});
+
+	// Set today's date as default
+	const dateInput = form.querySelector('input[name="chat_date"]');
+	if (dateInput) dateInput.valueAsDate = new Date();
 
 	loadChats();
 });

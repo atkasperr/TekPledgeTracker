@@ -3,32 +3,423 @@
 {% block title %}Coffee Chats{% endblock %}
 
 {% block content %}
-    <h2>Coffee Chats</h2>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  .cc-wrapper {
+    background: #060d1f;
+    min-height: 100vh;
+    margin: -16px;
+    padding: 16px;
+  }
+
+  .cc-page {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    color: #c8d8f0;
+  }
+
+  .cc-title {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 0 0.3rem;
+    font-family: 'Share Tech Mono', monospace;
+    text-align: left;
+  }
+
+  .cc-subtitle {
+    color: #4a6a8a;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 2.5rem;
+    line-height: 1.8;
+  }
+
+  /* Progress Card */
+  .cc-progress-card {
+    background: #0d1b2e;
+    border: 1px solid rgba(41,120,180,0.2);
+    border-left: 4px solid #f59e0b;
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cc-progress-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cc-progress-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0 0 0.3rem;
+  }
+
+  .cc-progress-sublabel {
+    font-size: 0.68rem;
+    color: #4a6a8a;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .cc-count-group {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .cc-count-block { text-align: center; }
+
+  .cc-count-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f59e0b;
+    line-height: 1;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .cc-count-num .slash { color: #4a6a8a; }
+
+  .cc-count-lbl {
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #4a6a8a;
+    margin-top: 0.25rem;
+  }
+
+  .cc-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .cc-bar-lbl {
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #4a6a8a;
+    width: 70px;
+    flex-shrink: 0;
+  }
+
+  .cc-bar-track {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .cc-bar-fill {
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+
+  .cc-bar-pct {
+    font-size: 0.65rem;
+    color: #4a6a8a;
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Form Card */
+  .cc-form-card {
+    background: #0d1b2e;
+    border: 1px solid rgba(41,120,180,0.2);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cc-form-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0 0 1.5rem;
+    text-align: left;
+  }
+
+  .cc-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .cc-form-grid { grid-template-columns: 1fr; }
+  }
+
+  .cc-field label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a6a8a;
+    margin-bottom: 0.5rem;
+  }
+
+  .cc-field input,
+  .cc-field textarea {
+    width: 100%;
+    background: rgba(6,13,31,0.7);
+    border: 1px solid rgba(41,120,180,0.3);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.85rem;
+    color: #c8d8f0;
+    font-family: 'Share Tech Mono', monospace;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .cc-field input::placeholder,
+  .cc-field textarea::placeholder { color: #2a4a6a; }
+
+  .cc-field input:focus,
+  .cc-field textarea:focus {
+    border-color: rgba(245,158,11,0.6);
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+  }
+
+  .cc-field textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .cc-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  .cc-submit-btn {
+    background: transparent;
+    border: 1px solid rgba(245,158,11,0.6);
+    color: #f59e0b;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0.7rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .cc-submit-btn:hover {
+    background: rgba(245,158,11,0.1);
+    box-shadow: 0 0 16px rgba(245,158,11,0.25);
+  }
+
+  /* Recent Chats Card */
+  .cc-recent-card {
+    background: #0d1b2e;
+    border: 1px solid rgba(41,120,180,0.2);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cc-recent-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .cc-recent-count {
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: #f59e0b;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+  }
+
+  .cc-chat-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(41,120,180,0.1);
+  }
+
+  .cc-chat-item:last-child { border-bottom: none; }
+
+  .cc-chat-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .cc-chat-check {
+    color: #f59e0b;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .cc-chat-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .cc-chat-desc {
+    font-size: 0.72rem;
+    color: #4a6a8a;
+    letter-spacing: 0.5px;
+  }
+
+  .cc-chat-date {
+    font-size: 0.65rem;
+    color: #4a6a8a;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .cc-no-chats {
+    font-size: 0.72rem;
+    color: #4a6a8a;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 1rem 0;
+  }
+</style>
+
+<div class="cc-wrapper">
+<div class="cc-page">
+
+  <h1 class="cc-title">Coffee Chats</h1>
+  <p class="cc-subtitle">
+    PLEDGE REQUIREMENT LOG //<br>
+    BROTHERHOOD CONNECTIONS
+  </p>
+
+  <!-- Progress Card -->
+  <div class="cc-progress-card">
+    <div class="cc-progress-top">
+      <div>
+        <p class="cc-progress-label">Week Progress</p>
+        <p class="cc-progress-sublabel">Completion status — current cycle</p>
+      </div>
+      <div class="cc-count-group">
+        <div class="cc-count-block">
+          <div class="cc-count-num">
+            <span id="chats-week">0</span><span class="slash">/4</span>
+          </div>
+          <div class="cc-count-lbl">This Week</div>
+        </div>
+        <div class="cc-count-block">
+          <div class="cc-count-num">
+            <span id="chats-done">0</span><span class="slash">/35</span>
+          </div>
+          <div class="cc-count-lbl">Semester</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cc-bar-row">
+      <span class="cc-bar-lbl">Weekly</span>
+      <div class="cc-bar-track">
+        <div class="cc-bar-fill" id="progress-4-fill"></div>
+      </div>
+      <span class="cc-bar-pct" id="progress-4-pct">0%</span>
+    </div>
+    <div class="cc-bar-row">
+      <span class="cc-bar-lbl">Semester</span>
+      <div class="cc-bar-track">
+        <div class="cc-bar-fill" id="progress-35-fill"></div>
+      </div>
+      <span class="cc-bar-pct" id="progress-35-pct">0%</span>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="cc-form-card">
+    <p class="cc-form-title">+ Log a Coffee Chat</p>
     <form id="coffee-chat-form">
-        <input type="text" name="brother_fullname" placeholder="Brother full name" required><br>
-        <input type="date" name="chat_date" required><br>
-        <textarea name="description" placeholder="Short description"></textarea><br>
-        <button type="submit">Submit Coffee Chat</button>
+      <div class="cc-form-grid">
+        <div class="cc-field">
+          <label>Brother Name</label>
+          <input type="text" name="brother_fullname" placeholder="Full name" required>
+        </div>
+        <div class="cc-field">
+          <label>Date</label>
+          <input type="date" name="chat_date" required>
+        </div>
+        <div class="cc-field">
+          <label>Notes (Optional)</label>
+          <input type="text" name="description" placeholder="Short description">
+        </div>
+      </div>
+      <div class="cc-form-footer">
+        <button type="submit" class="cc-submit-btn">+ Submit Chat</button>
+      </div>
     </form>
-    <div id="coffee-chat-progress">
-        <p>Chats done: <span id="chats-done">0</span></p>
-        <p>Chats needed this week: <span id="chats-week">0</span></p>
-        <p>Chats needed this semester: <span id="chats-semester">0</span></p>
-        <div class="progress-block">
-            <label>Progress (out of 35): <span id="progress-35-text">0 / 35</span></label>
-            <div class="progress"><div id="progress-35-fill" class="progress-inner" style="width:0%"></div></div>
-        </div>
-        <div class="progress-block">
-            <label>Progress (out of 4): <span id="progress-4-text">0 / 4</span></label>
-            <div class="progress"><div id="progress-4-fill" class="progress-inner" style="width:0%"></div></div>
-        </div>
+  </div>
+
+</div>
+
+  <!-- Recent Chats Card -->
+  <div class="cc-recent-card">
+    <p class="cc-recent-title">
+      Recent Chats
+      <span class="cc-recent-count" id="recent-count">0</span>
+    </p>
+    <div id="recent-chats-list">
+      <p class="cc-no-chats">No chats logged yet.</p>
     </div>
-    <div id="recent-chats" class="recent-chats">
-        <h3>Recent Chats</h3>
-        <ul id="recent-chats-list" class="recent-chats-list">
-            <!-- recent items rendered here -->
-        </ul>
-    </div>
+  </div>
+
+</div>
+
+</div> <!-- end cc-wrapper -->
+
+<!-- Hidden spans kept for JS compatibility -->
+<div style="display:none">
+  <span id="chats-semester">0</span>
+  <span id="progress-35-text">0 / 35</span>
+  <span id="progress-4-text">0 / 4</span>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
