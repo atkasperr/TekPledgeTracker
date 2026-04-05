@@ -1,531 +1,549 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weekly Tasks</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% extends "base.html" %}
  
-    :root {
-      --navy: #1e2d3d;
-      --navy-light: #263545;
-      --gold: #f5a623;
-      --gold-light: #fdf3e0;
-      --green: #22c55e;
-      --green-light: #dcfce7;
-      --red-light: #fee2e2;
-      --red: #ef4444;
-      --gray-bg: #f2f3f5;
-      --gray-border: #e2e5ea;
-      --gray-bar: #d1d5db;
-      --text-main: #1a2332;
-      --text-sub: #6b7280;
-      --white: #ffffff;
-      --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      --radius: 16px;
-    }
+{% block title %}Weekly Tasks{% endblock %}
  
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--gray-bg);
-      color: var(--text-main);
-      min-height: 100vh;
-      padding: 32px 24px 60px;
-    }
+{% block content %}
+<style>
+  :root {
+    --gold: #f5a623;
+    --gold-dim: rgba(245, 166, 35, 0.15);
+    --green: #22c55e;
+    --green-light: rgba(34, 197, 94, 0.12);
+    --red: #ef4444;
+    --red-light: rgba(239, 68, 68, 0.12);
+    --navy: #0a1628;
+    --navy-card: #0f2340;
+    --navy-border: rgba(255,255,255,0.07);
+    --text-main: #e8edf5;
+    --text-sub: #7a93b4;
+    --gray-bar: rgba(255,255,255,0.08);
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --radius: 14px;
+  }
  
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+  .tasks-page {
+    position: relative;
+    min-height: 100vh;
+    background: var(--navy);
+    color: var(--text-main);
+    padding: 44px 36px 80px;
+    font-family: 'Courier New', 'Lucida Console', monospace;
+  }
  
-    /* Header */
-    .header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 28px;
-    }
-    .header-left h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: -0.5px;
-    }
-    .header-left p {
-      color: var(--text-sub);
-      font-size: 0.95rem;
-      margin-top: 4px;
-    }
-    .week-nav {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--white);
-      border-radius: 12px;
-      padding: 10px 18px;
-      box-shadow: var(--card-shadow);
-      border: 1px solid var(--gray-border);
-    }
-    .week-nav button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-sub);
-      font-size: 1.1rem;
-      padding: 2px 6px;
-      border-radius: 6px;
-      transition: background 0.15s;
-    }
-    .week-nav button:hover { background: var(--gray-bg); }
-    .week-nav span {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--text-main);
-      min-width: 170px;
-      text-align: center;
-    }
+  .tasks-container {
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
  
-    /* Progress Banner */
-    .progress-banner {
-      background: var(--navy);
-      border-radius: var(--radius);
-      padding: 28px 32px;
-      margin-bottom: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      animation: fadeUp 0.4s ease both;
-    }
-    .progress-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .progress-label h2 {
-      color: var(--white);
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-    .progress-label p {
-      color: #8fa3b8;
-      font-size: 0.88rem;
-      margin-top: 2px;
-    }
-    .progress-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .tasks-count {
-      text-align: right;
-    }
-    .tasks-count .count {
-      color: var(--white);
-      font-size: 1.8rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-    .tasks-count .label {
-      color: #8fa3b8;
-      font-size: 0.82rem;
-      margin-top: 2px;
-    }
-    .circle-progress {
-      position: relative;
-      width: 72px;
-      height: 72px;
-    }
-    .circle-progress svg {
-      transform: rotate(-90deg);
-    }
-    .circle-progress .pct {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--white);
-    }
-    .progress-bar-track {
-      background: #3a4f63;
-      border-radius: 999px;
-      height: 10px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: var(--gold);
-      transition: width 0.8s cubic-bezier(.4,0,.2,1);
-    }
+  /* Header */
+  .tasks-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .tasks-header-left h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .tasks-header-left p {
+    color: var(--text-sub);
+    font-size: 0.88rem;
+    margin-top: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
  
-    /* Task Grid */
-    .task-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
+  .week-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--navy-card);
+    border: 1px solid var(--navy-border);
+    border-radius: 10px;
+    padding: 12px 22px;
+    box-shadow: var(--card-shadow);
+  }
+  .week-nav button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-sub);
+    font-size: 1.2rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    font-family: inherit;
+  }
+  .week-nav button:hover { color: var(--gold); background: var(--gold-dim); }
+  .week-nav span {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    min-width: 200px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
  
-    /* Task Card */
-    .task-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--card-shadow);
-      border: 2px solid transparent;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      animation: fadeUp 0.4s ease both;
-      transition: box-shadow 0.2s;
-    }
-    .task-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.11); }
-    .task-card.completed {
-      border-color: var(--gold);
-      background: #fffdf7;
-    }
+  /* Progress Banner */
+  .progress-banner {
+    background: var(--navy-card);
+    border: 1px solid var(--navy-border);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 30px 36px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    box-shadow: var(--card-shadow);
+    animation: fadeUp 0.4s ease both;
+  }
+  .progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .progress-label h2 {
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .progress-label p {
+    color: var(--text-sub);
+    font-size: 0.88rem;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+  }
+  .progress-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .tasks-count { text-align: right; }
+  .tasks-count .count {
+    color: var(--gold);
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .tasks-count .count-label {
+    color: var(--text-sub);
+    font-size: 0.82rem;
+    margin-top: 5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
  
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-    .card-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 1.3rem;
-    }
-    .card-icon.dark { background: var(--navy); color: var(--white); }
-    .card-icon.gold { background: var(--gold); color: var(--white); }
+  .circle-progress {
+    position: relative;
+    width: 74px;
+    height: 74px;
+  }
+  .circle-progress svg { transform: rotate(-90deg); }
+  .circle-progress .pct {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
  
-    .card-info { flex: 1; }
-    .card-info h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text-main);
-      line-height: 1.3;
-    }
-    .card-info h3.done {
-      text-decoration: line-through;
-      color: var(--text-sub);
-    }
-    .card-info p {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      margin-top: 3px;
-      line-height: 1.4;
-    }
+  .progress-bar-track {
+    background: var(--gray-bar);
+    border-radius: 999px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--gold);
+    transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 10px rgba(245,166,35,0.5);
+  }
  
-    /* Pip progress */
-    .pip-section { display: flex; flex-direction: column; gap: 8px; }
-    .pip-label {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-    .pip-label.green { color: var(--green); }
-    .pips {
-      display: flex;
-      gap: 6px;
-    }
-    .pip {
-      flex: 1;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--gray-bar);
-      transition: background 0.3s;
-    }
-    .pip.filled { background: var(--gold); }
+  /* Task Grid */
+  .task-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
  
-    /* Single bar */
-    .bar-track {
-      background: var(--gray-bar);
-      border-radius: 999px;
-      height: 8px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: var(--gold);
-      transition: width 0.6s ease;
-    }
+  /* Task Card */
+  .task-card {
+    background: var(--navy-card);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--navy-border);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeUp 0.4s ease both;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .task-card:hover {
+    border-color: rgba(255,255,255,0.13);
+    box-shadow: 0 6px 32px rgba(0,0,0,0.5);
+  }
+  .task-card.completed {
+    border-color: rgba(245,166,35,0.3);
+    box-shadow: 0 0 20px rgba(245,166,35,0.06);
+  }
  
-    /* Buttons */
-    .card-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .btn-complete {
-      flex: 1;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .btn-complete.mark {
-      background: var(--navy);
-      color: var(--white);
-    }
-    .btn-complete.mark:hover { background: #263d52; transform: translateY(-1px); }
-    .btn-complete.done-btn {
-      background: var(--green-light);
-      color: var(--green);
-    }
-    .btn-minus {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      border: 1.5px solid var(--gray-border);
-      background: var(--white);
-      color: var(--red);
-      font-size: 1.2rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .btn-minus:hover { background: var(--red-light); border-color: var(--red); }
+  .card-info h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .card-info h3.done {
+    text-decoration: line-through;
+    color: var(--text-sub);
+  }
+  .card-info p {
+    font-size: 0.88rem;
+    color: var(--text-sub);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
  
-    /* Reminders */
-    .reminders-card {
-      grid-column: 1 / -1;
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px 28px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      animation: fadeUp 0.5s ease both;
-    }
-    .reminders-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      background: var(--gold);
-      color: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-    .reminders-body h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 2px;
-    }
-    .reminders-body .sub {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      margin-bottom: 14px;
-    }
-    .reminders-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .reminders-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 0.92rem;
-      color: var(--text-main);
-      line-height: 1.5;
-    }
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--gold);
-      margin-top: 6px;
-      flex-shrink: 0;
-    }
+  /* Pip progress */
+  .pip-section { display: flex; flex-direction: column; gap: 10px; }
+  .pip-label {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .pip-label.green { color: var(--green); }
+  .pips { display: flex; gap: 6px; }
+  .pip {
+    flex: 1;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--gray-bar);
+    transition: background 0.3s;
+  }
+  .pip.filled {
+    background: var(--gold);
+    box-shadow: 0 0 6px rgba(245,166,35,0.45);
+  }
  
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  /* Single bar */
+  .bar-track {
+    background: var(--gray-bar);
+    border-radius: 999px;
+    height: 5px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--gold);
+    box-shadow: 0 0 6px rgba(245,166,35,0.45);
+    transition: width 0.6s ease;
+  }
  
-    /* Responsive */
-    @media (max-width: 700px) {
-      .task-grid { grid-template-columns: 1fr; }
-      .header { flex-direction: column; gap: 16px; }
-      .progress-top { flex-wrap: wrap; gap: 12px; }
-    }
-  </style>
-</head>
-<body>
-<div class="container">
+  /* Buttons */
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-complete {
+    flex: 1;
+    padding: 13px 16px;
+    border-radius: 8px;
+    border: 1px solid;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.18s;
+  }
+  .btn-complete.mark {
+    background: transparent;
+    color: var(--text-main);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .btn-complete.mark:hover {
+    background: var(--gold-dim);
+    border-color: rgba(245,166,35,0.45);
+    color: var(--gold);
+  }
+  .btn-complete.done-btn {
+    background: var(--green-light);
+    color: var(--green);
+    border-color: rgba(34,197,94,0.2);
+    cursor: default;
+  }
+  .btn-minus {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    border: 1px solid rgba(239,68,68,0.2);
+    background: transparent;
+    color: var(--red);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+    font-family: inherit;
+  }
+  .btn-minus:hover {
+    background: var(--red-light);
+    border-color: rgba(239,68,68,0.45);
+  }
  
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <h1>Weekly Tasks</h1>
-      <p>Complete your pledge requirements for the week</p>
-    </div>
-    <div class="week-nav">
-      <button onclick="changeWeek(-1)">&#8249;</button>
-      <span id="weekLabel">Mar 24 – Mar 30, 2026</span>
-      <button onclick="changeWeek(1)">&#8250;</button>
-    </div>
-  </div>
+  /* Reminders */
+  .reminders-card {
+    grid-column: 1 / -1;
+    background: var(--navy-card);
+    border: 1px solid var(--navy-border);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 26px 32px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    animation: fadeUp 0.5s ease both;
+  }
+  .reminders-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-dim);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 5px;
+    padding: 6px 12px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .reminders-divider {
+    width: 1px;
+    background: var(--navy-border);
+    align-self: stretch;
+    flex-shrink: 0;
+  }
+  .reminders-body h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .reminders-body .sub {
+    font-size: 0.84rem;
+    color: var(--text-sub);
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+  }
+  .reminders-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .reminders-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.88rem;
+    color: var(--text-sub);
+    line-height: 1.65;
+  }
+  .reminder-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin-top: 9px;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(245,166,35,0.7);
+  }
  
-  <!-- Progress Banner -->
-  <div class="progress-banner">
-    <div class="progress-top">
-      <div class="progress-label">
-        <h2>Week Progress</h2>
-        <p>Track your completion for this week</p>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  @media (max-width: 700px) {
+    .task-grid { grid-template-columns: 1fr; }
+    .tasks-header { flex-direction: column; gap: 16px; }
+    .progress-top { flex-wrap: wrap; gap: 12px; }
+    .tasks-page { padding: 24px 16px 60px; }
+  }
+</style>
+ 
+<div class="tasks-page">
+  <div class="tasks-container">
+ 
+    <!-- Header -->
+    <div class="tasks-header">
+      <div class="tasks-header-left">
+        <h1>Weekly Tasks</h1>
+        <p>Pledge requirement log &nbsp;//&nbsp; active cycle</p>
       </div>
-      <div class="progress-right">
-        <div class="tasks-count">
-          <div class="count" id="countDisplay">4/8</div>
-          <div class="label">Tasks completed</div>
-        </div>
-        <div class="circle-progress">
-          <svg width="72" height="72" viewBox="0 0 72 72">
-            <circle cx="36" cy="36" r="30" fill="none" stroke="#3a4f63" stroke-width="6"/>
-            <circle cx="36" cy="36" r="30" fill="none" stroke="white" stroke-width="6"
-              stroke-dasharray="188.5"
-              stroke-dashoffset="94.25"
-              stroke-linecap="round"
-              id="circleArc"/>
-          </svg>
-          <div class="pct" id="pctDisplay">50%</div>
-        </div>
+      <div class="week-nav">
+        <button onclick="changeWeek(-1)">&#8249;</button>
+        <span id="weekLabel">Mar 24 – Mar 30, 2026</span>
+        <button onclick="changeWeek(1)">&#8250;</button>
       </div>
     </div>
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="mainBar" style="width:50%"></div>
+ 
+    <!-- Progress Banner -->
+    <div class="progress-banner">
+      <div class="progress-top">
+        <div class="progress-label">
+          <h2>Week Progress</h2>
+          <p>Completion status — current cycle</p>
+        </div>
+        <div class="progress-right">
+          <div class="tasks-count">
+            <div class="count" id="countDisplay">0/8</div>
+            <div class="count-label">Tasks completed</div>
+          </div>
+          <div class="circle-progress">
+            <svg width="74" height="74" viewBox="0 0 74 74">
+              <circle cx="37" cy="37" r="30" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+              <circle cx="37" cy="37" r="30" fill="none" stroke="#f5a623" stroke-width="5"
+                stroke-dasharray="188.5"
+                stroke-dashoffset="188.5"
+                stroke-linecap="round"
+                id="circleArc"
+                style="filter: drop-shadow(0 0 5px rgba(245,166,35,0.6))"/>
+            </svg>
+            <div class="pct" id="pctDisplay">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="mainBar" style="width:0%"></div>
+      </div>
     </div>
-  </div>
  
-  <!-- Task Grid -->
-  <div class="task-grid">
+    <!-- Task Grid -->
+    <div class="task-grid">
  
-    <!-- Pledge Task -->
-    <div class="task-card" id="card-pledge">
-      <div class="card-header">
-        <div class="card-icon dark">&#9989;</div>
+      <!-- Pledge Task -->
+      <div class="task-card" id="card-pledge">
         <div class="card-info">
           <h3>Pledge Task</h3>
           <p>Complete weekly pledge requirements</p>
         </div>
+        <div class="pip-section">
+          <div class="pip-label" id="pledge-label">0 / 5 completed</div>
+          <div class="pips" id="pledge-pips"></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-complete mark" onclick="markComplete('pledge')">+ Mark Complete</button>
+          <button class="btn-minus" onclick="unmark('pledge')">&#8722;</button>
+        </div>
       </div>
-      <div class="pip-section">
-        <div class="pip-label" id="pledge-label">2/5 completed</div>
-        <div class="pips" id="pledge-pips"></div>
-      </div>
-      <div class="card-actions">
-        <button class="btn-complete mark" onclick="markComplete('pledge')">+ Mark Complete</button>
-        <button class="btn-minus" onclick="unmark('pledge')">&#8722;</button>
-      </div>
-    </div>
  
-    <!-- Tabling -->
-    <div class="task-card" id="card-tabling">
-      <div class="card-header">
-        <div class="card-icon dark">&#128203;</div>
+      <!-- Tabling -->
+      <div class="task-card" id="card-tabling">
         <div class="card-info">
           <h3>Tabling</h3>
-          <p>Monday 3-11 PM, Tuesday 3-11 PM, or Wednesday 3-8 PM</p>
+          <p>Mon 3–11 PM &nbsp;/&nbsp; Tue 3–11 PM &nbsp;/&nbsp; Wed 3–8 PM</p>
+        </div>
+        <div class="pip-section">
+          <div class="pip-label" id="tabling-label">0 / 1 completed</div>
+          <div class="bar-track"><div class="bar-fill" id="tabling-bar" style="width:0%"></div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-complete mark" id="tabling-btn" onclick="markComplete('tabling')">+ Mark Complete</button>
+          <button class="btn-minus" onclick="unmark('tabling')">&#8722;</button>
         </div>
       </div>
-      <div class="pip-section">
-        <div class="pip-label" id="tabling-label">0/1 completed</div>
-        <div class="bar-track"><div class="bar-fill" id="tabling-bar" style="width:0%"></div></div>
-      </div>
-      <div class="card-actions">
-        <button class="btn-complete mark" id="tabling-btn" onclick="markComplete('tabling')">+ Mark Complete</button>
-        <button class="btn-minus" onclick="unmark('tabling')">&#8722;</button>
-      </div>
-    </div>
  
-    <!-- Weekly Hangout -->
-    <div class="task-card completed" id="card-hangout">
-      <div class="card-header">
-        <div class="card-icon gold">&#128101;</div>
+      <!-- Weekly Hangout -->
+      <div class="task-card" id="card-hangout">
         <div class="card-info">
-          <h3 class="done">Weekly Hangout</h3>
+          <h3 id="hangout-title">Weekly Hangout</h3>
           <p>Attend brotherhood hangout this week</p>
         </div>
-      </div>
-      <div class="pip-section">
-        <div class="pip-label green">1/1 completed</div>
-        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
-      </div>
-      <div class="card-actions">
-        <button class="btn-complete done-btn">&#10003; Complete</button>
-        <button class="btn-minus" onclick="unmark('hangout')">&#8722;</button>
-      </div>
-    </div>
- 
-    <!-- Study Session -->
-    <div class="task-card completed" id="card-study">
-      <div class="card-header">
-        <div class="card-icon gold">&#128218;</div>
-        <div class="card-info">
-          <h3 class="done">Study Session</h3>
-          <p>Complete study session with brothers</p>
+        <div class="pip-section">
+          <div class="pip-label" id="hangout-label">0 / 1 completed</div>
+          <div class="bar-track"><div class="bar-fill" id="hangout-bar" style="width:0%"></div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-complete mark" id="hangout-btn" onclick="markComplete('hangout')">+ Mark Complete</button>
+          <button class="btn-minus" onclick="unmark('hangout')">&#8722;</button>
         </div>
       </div>
-      <div class="pip-section">
-        <div class="pip-label green">1/1 completed</div>
-        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
-      </div>
-      <div class="card-actions">
-        <button class="btn-complete done-btn">&#10003; Complete</button>
-        <button class="btn-minus" onclick="unmark('study')">&#8722;</button>
-      </div>
-    </div>
  
-    <!-- Weekly Reminders -->
-    <div class="reminders-card">
-      <div class="reminders-icon">&#8505;</div>
-      <div class="reminders-body">
-        <h3>Weekly Reminders</h3>
-        <p class="sub">Important information about your tasks</p>
-        <ul class="reminders-list">
-          <li><span class="dot"></span><span>Tabling hours: Choose Monday (3-11 PM), Tuesday (3-11 PM), or Wednesday (3-8 PM)</span></li>
-          <li><span class="dot"></span><span>You only need to attend 1 hour of tabling per week</span></li>
-          <li><span class="dot"></span><span>Complete your weekly hangout and study session anytime during the week</span></li>
-        </ul>
+      <!-- Study Session -->
+      <div class="task-card" id="card-study">
+        <div class="card-info">
+          <h3 id="study-title">Study Session</h3>
+          <p>Complete study session with brothers</p>
+        </div>
+        <div class="pip-section">
+          <div class="pip-label" id="study-label">0 / 1 completed</div>
+          <div class="bar-track"><div class="bar-fill" id="study-bar" style="width:0%"></div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-complete mark" id="study-btn" onclick="markComplete('study')">+ Mark Complete</button>
+          <button class="btn-minus" onclick="unmark('study')">&#8722;</button>
+        </div>
       </div>
-    </div>
  
+      <!-- Reminders -->
+      <div class="reminders-card">
+        <div class="reminders-tag">// Notice</div>
+        <div class="reminders-divider"></div>
+        <div class="reminders-body">
+          <h3>Weekly Reminders</h3>
+          <p class="sub">Standing directives — active all cycle</p>
+          <ul class="reminders-list">
+            <li><span class="reminder-dot"></span><span>Tabling hours: select one slot — Monday (3–11 PM), Tuesday (3–11 PM), or Wednesday (3–8 PM)</span></li>
+            <li><span class="reminder-dot"></span><span>Minimum attendance is 1 hour of tabling per week</span></li>
+            <li><span class="reminder-dot"></span><span>Weekly hangout and study session may be completed at any point during the cycle</span></li>
+          </ul>
+        </div>
+      </div>
+ 
+    </div>
   </div>
 </div>
+{% endblock %}
  
+{% block scripts %}
+<script src="/static/js/tasks.js"></script>
 <script>
-  // State
   const state = {
-    pledge: { completed: 2, total: 5 },
+    pledge:  { completed: 0, total: 5 },
     tabling: { completed: 0, total: 1 },
-    hangout: { completed: 1, total: 1 },
-    study: { completed: 1, total: 1 },
+    hangout: { completed: 0, total: 1 },
+    study:   { completed: 0, total: 1 },
   };
  
-  // Week nav
   const weeks = [
     'Mar 10 – Mar 16, 2026',
     'Mar 17 – Mar 23, 2026',
@@ -534,12 +552,12 @@
     'Apr 7 – Apr 13, 2026',
   ];
   let weekIdx = 2;
+ 
   function changeWeek(dir) {
     weekIdx = Math.max(0, Math.min(weeks.length - 1, weekIdx + dir));
     document.getElementById('weekLabel').textContent = weeks[weekIdx];
   }
  
-  // Render pips for pledge
   function renderPledgePips() {
     const { completed, total } = state.pledge;
     const container = document.getElementById('pledge-pips');
@@ -549,77 +567,68 @@
       pip.className = 'pip' + (i < completed ? ' filled' : '');
       container.appendChild(pip);
     }
-    document.getElementById('pledge-label').textContent = `${completed}/${total} completed`;
+    document.getElementById('pledge-label').textContent = `${completed} / ${total} completed`;
   }
  
-  // Update overall progress
   function updateProgress() {
-    const total = state.pledge.total + state.tabling.total + state.hangout.total + state.study.total;
-    const done = state.pledge.completed + state.tabling.completed + state.hangout.completed + state.study.completed;
-    const pct = Math.round((done / total) * 100);
+    const total = Object.values(state).reduce((s, t) => s + t.total, 0);
+    const done  = Object.values(state).reduce((s, t) => s + t.completed, 0);
+    const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
     document.getElementById('countDisplay').textContent = `${done}/${total}`;
-    document.getElementById('pctDisplay').textContent = `${pct}%`;
-    document.getElementById('mainBar').style.width = pct + '%';
-    // Circle: circumference = 2*pi*30 ≈ 188.5
+    document.getElementById('pctDisplay').textContent   = `${pct}%`;
+    document.getElementById('mainBar').style.width      = pct + '%';
     const offset = 188.5 - (188.5 * pct / 100);
     document.getElementById('circleArc').setAttribute('stroke-dashoffset', offset);
   }
  
   function markComplete(task) {
-    const s = state[task];
-    if (s.completed < s.total) {
-      s.completed++;
+    if (state[task].completed < state[task].total) {
+      state[task].completed++;
       renderCard(task);
       updateProgress();
     }
   }
  
   function unmark(task) {
-    const s = state[task];
-    if (s.completed > 0) {
-      s.completed--;
+    if (state[task].completed > 0) {
+      state[task].completed--;
       renderCard(task);
       updateProgress();
     }
   }
  
   function renderCard(task) {
-    const s = state[task];
-    const card = document.getElementById('card-' + task);
+    const s      = state[task];
+    const card   = document.getElementById('card-' + task);
     const isDone = s.completed >= s.total;
+ 
+    card.classList.toggle('completed', isDone);
  
     if (task === 'pledge') {
       renderPledgePips();
-      card.classList.toggle('completed', isDone);
-      const h3 = card.querySelector('h3');
-      h3.classList.toggle('done', isDone);
+      card.querySelector('h3').classList.toggle('done', isDone);
       const btn = card.querySelector('.btn-complete');
-      btn.className = 'btn-complete ' + (isDone ? 'done-btn' : 'mark');
-      btn.textContent = isDone ? '✓ Complete' : '+ Mark Complete';
-      btn.onclick = isDone ? null : () => markComplete('pledge');
-      const label = document.getElementById('pledge-label');
-      label.className = 'pip-label' + (isDone ? ' green' : '');
+      btn.className   = 'btn-complete ' + (isDone ? 'done-btn' : 'mark');
+      btn.textContent = isDone ? '// Complete' : '+ Mark Complete';
+      btn.onclick     = isDone ? null : () => markComplete('pledge');
+      document.getElementById('pledge-label').className = 'pip-label' + (isDone ? ' green' : '');
     } else {
       const pct = s.total > 0 ? (s.completed / s.total * 100) : 0;
-      const bar = card.querySelector('.bar-fill');
+      const bar = document.getElementById(task + '-bar');
       if (bar) bar.style.width = pct + '%';
-      const label = card.querySelector('.pip-label');
-      label.textContent = `${s.completed}/${s.total} completed`;
-      label.className = 'pip-label' + (isDone ? ' green' : '');
-      card.classList.toggle('completed', isDone);
-      const h3 = card.querySelector('h3');
-      h3.classList.toggle('done', isDone);
-      const btn = card.querySelector('.btn-complete');
-      btn.className = 'btn-complete ' + (isDone ? 'done-btn' : 'mark');
-      btn.textContent = isDone ? '✓ Complete' : '+ Mark Complete';
-      btn.onclick = isDone ? null : () => markComplete(task);
+      const lbl = document.getElementById(task + '-label');
+      lbl.textContent = `${s.completed} / ${s.total} completed`;
+      lbl.className   = 'pip-label' + (isDone ? ' green' : '');
+      card.querySelector('h3').classList.toggle('done', isDone);
+      const btn = document.getElementById(task + '-btn');
+      btn.className   = 'btn-complete ' + (isDone ? 'done-btn' : 'mark');
+      btn.textContent = isDone ? '// Complete' : '+ Mark Complete';
+      btn.onclick     = isDone ? null : () => markComplete(task);
     }
   }
  
-  // Init
   renderPledgePips();
   updateProgress();
 </script>
-</body>
-</html>
+{% endblock %}
  
