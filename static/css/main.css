@@ -363,6 +363,68 @@ button:hover {
     color: #0f172a;
     font-size: 13px;
 }
+
+/* Leaderboard styles */
+.leaderboard {
+    max-width: 720px;
+    margin-top: 18px;
+    background: #fff;
+    border: 1px solid #e6eef8;
+    padding: 12px;
+    border-radius: 8px;
+}
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+.leaderboard-table th,
+.leaderboard-table td {
+    text-align: left;
+    padding: 8px 6px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.leaderboard-table thead th {
+    font-size: 13px;
+    color: #0f172a;
+}
+.leaderboard-table tbody tr:hover {
+    background: #f8fafc;
+}
+.leaderboard-count {
+    font-weight: 700;
+}
+
+/* Tooltip for leaderboard rows */
+.leaderboard-tooltip {
+    position: absolute;
+    z-index: 1200;
+    background: #ffffff;
+    border: 1px solid #e6eef8;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+    padding: 10px;
+    border-radius: 8px;
+    min-width: 220px;
+    max-width: 420px;
+    display: none;
+    font-size: 13px;
+}
+.leaderboard-tooltip h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+}
+.leaderboard-tooltip ul {
+    margin: 0;
+    padding: 0 0 0 14px;
+}
+.leaderboard-tooltip li {
+    margin: 6px 0;
+}
+.leaderboard-tooltip .chat-date {
+    color: #64748b;
+    font-size: 12px;
+    margin-left: 6px;
+}
 #calendar-view {
     display: flex;
     justify-content: center;
