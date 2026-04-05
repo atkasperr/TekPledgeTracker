@@ -79,19 +79,17 @@ def api_coffee_chats():
         return jsonify(data)
     else:
         payload = request.json or {}
-        # basic validation: ensure referenced pledge and brother exist
+        # basic validation: ensure referenced pledge exists and brother_fullname is provided
         pledge_key = payload.get('pledge_uniq')
-        brother_key = payload.get('brother_uniq')
+        brother_name = payload.get('brother_fullname')
         if pledge_key:
             pledge_check = supabase.table('pledges').select('uniquename').eq('uniquename', pledge_key).limit(1).execute()
             pledge_data = getattr(pledge_check, 'data', pledge_check)
             if not pledge_data:
                 return jsonify({'status': 'error', 'message': f'pledge_uniq "{pledge_key}" not found in pledges'}), 400
-        if brother_key:
-            brother_check = supabase.table('brothers').select('uniquename').eq('uniquename', brother_key).limit(1).execute()
-            brother_data = getattr(brother_check, 'data', brother_check)
-            if not brother_data:
-                return jsonify({'status': 'error', 'message': f'brother_uniq "{brother_key}" not found in brothers'}), 400
+        # brother_fullname is required by the coffee_chat table schema
+        if not brother_name:
+            return jsonify({'status': 'error', 'message': 'brother_fullname is required'}), 400
 
         try:
             res = supabase.table('coffee_chat').insert(payload).execute()
