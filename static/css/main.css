@@ -77,10 +77,17 @@ body {
 .home-title {
     color: #ffffff;
     font-weight: 800;
-    margin: 0;
+    margin: 140px auto 0;
     font-size: clamp(28px, 6vw, 72px);
     letter-spacing: 0.5px;
-    text-shadow: 0 10px 30px rgba(41,55,134,0.35);
+    font-family: 'Cinzel', serif;
+
+    text-shadow:
+        0 0 5px rgba(255, 255, 255, 0.6),
+        0 0 10px rgba(255, 255, 255, 0.5),
+        0 0 20px rgba(41,55,134,0.6),
+        0 0 40px rgba(41,55,134,0.4),
+        0 10px 30px rgba(41,55,134,0.35);
 }
 
 .welcome-actions {
