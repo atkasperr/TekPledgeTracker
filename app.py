@@ -130,7 +130,7 @@ def api_pledges():
 
         # Only allow columns that the signup form sends.
         # This avoids Supabase/PostgREST errors when extra keys (like `role`) aren't present in the table schema.
-        allowed_fields = {'uniquename', 'name', 'email', 'phone', 'year', 'major', 'pc'}
+        allowed_fields = {'uniquename', 'name', 'email', 'phone', 'year', 'major', 'pc', 'tasks_per_week'}
         payload = {k: v for k, v in payload.items() if k in allowed_fields}
 
         # Normalize empty strings and trim whitespace.
@@ -150,6 +150,15 @@ def api_pledges():
                 payload['year'] = int(payload['year'])
             except (TypeError, ValueError):
                 return jsonify({'status': 'error', 'message': 'year must be a number'}), 400
+
+        if payload.get('tasks_per_week') is not None:
+            try:
+                n = int(payload['tasks_per_week'])
+            except (TypeError, ValueError):
+                return jsonify({'status': 'error', 'message': 'tasks_per_week must be a number'}), 400
+            if n < 0 or n > 50:
+                return jsonify({'status': 'error', 'message': 'tasks_per_week must be between 0 and 50'}), 400
+            payload['tasks_per_week'] = n
 
         try:
             res = supabase.table('pledges').insert(payload).execute()

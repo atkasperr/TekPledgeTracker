@@ -1,5 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('signup-form');
+	const roleSelect = document.getElementById('role');
+	const pledgeFields = document.getElementById('pledge-signup-fields');
+	const tasksPerWeekInput = document.getElementById('tasks_per_week');
+
+	function syncPledgeFieldsVisibility() {
+		const isPledge = roleSelect && roleSelect.value === 'pledge';
+		if (pledgeFields) pledgeFields.style.display = isPledge ? '' : 'none';
+		if (tasksPerWeekInput) {
+			tasksPerWeekInput.disabled = !isPledge;
+			if (!isPledge) tasksPerWeekInput.value = '';
+		}
+	}
+	if (roleSelect) {
+		roleSelect.addEventListener('change', syncPledgeFieldsVisibility);
+		syncPledgeFieldsVisibility();
+	}
 
 	// initialize supabase client from config.js
 	const supabaseClient = typeof supabase !== 'undefined' && CONFIG ? supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY) : null;
