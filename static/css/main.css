@@ -252,6 +252,13 @@ body {
     font-weight: 600;
 }
 
+.auth-field-hint {
+    margin: -4px 0 0;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
 .auth-label-row {
     display: flex;
     justify-content: space-between;

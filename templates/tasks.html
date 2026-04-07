@@ -537,12 +537,39 @@
 {% block scripts %}
 <script src="/static/js/tasks.js"></script>
 <script>
+  const PLEDGE_TOTAL_DEFAULT = 5;
+
   const state = {
-    pledge:  { completed: 0, total: 5 },
+    pledge:  { completed: 0, total: PLEDGE_TOTAL_DEFAULT },
     tabling: { completed: 0, total: 1 },
     hangout: { completed: 0, total: 1 },
     study:   { completed: 0, total: 1 },
   };
+
+  async function applyPledgeTasksPerWeekFromProfile() {
+    if (typeof supabase === 'undefined' || typeof CONFIG === 'undefined' || !CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_KEY) {
+      return;
+    }
+    try {
+      const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+      const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
+      if (userErr || !userData?.user?.email) return;
+      const { data: rows, error: pledgeErr } = await supabaseClient
+        .from('pledges')
+        .select('tasks_per_week')
+        .eq('email', userData.user.email)
+        .limit(1);
+      if (pledgeErr || !rows || !rows.length) return;
+      const pledgeRow = rows[0];
+      const n = pledgeRow.tasks_per_week;
+      if (n == null || n === '') return;
+      const parsed = Number(n);
+      if (!Number.isFinite(parsed) || parsed < 0) return;
+      state.pledge.total = Math.min(50, Math.max(0, Math.round(parsed)));
+    } catch (e) {
+      console.warn('Could not load tasks_per_week for pledge', e);
+    }
+  }
  
   const weeks = [
     'Mar 10 – Mar 16, 2026',
@@ -600,7 +627,7 @@
   function renderCard(task) {
     const s      = state[task];
     const card   = document.getElementById('card-' + task);
-    const isDone = s.completed >= s.total;
+    const isDone = s.total > 0 && s.completed >= s.total;
  
     card.classList.toggle('completed', isDone);
  
@@ -627,8 +654,12 @@
     }
   }
  
-  renderPledgePips();
-  updateProgress();
+  (async () => {
+    await applyPledgeTasksPerWeekFromProfile();
+    renderPledgePips();
+    renderCard('pledge');
+    updateProgress();
+  })();
 </script>
 {% endblock %}
  
