@@ -21,7 +21,8 @@
 
             <div id="pledge-signup-fields">
                 <label for="tasks_per_week">How many times per week do you have to do your task?</label>
-                <input id="tasks_per_week" type="number" name="tasks_per_week" min="0" max="50" step="1" placeholder="e.g. 5">
+                <input id="tasks_per_week" type="text" name="tasks_per_week" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="e.g. 5" aria-describedby="tasks_per_week_hint">
+                <p id="tasks_per_week_hint" class="auth-field-hint">Enter a whole number from 0 to 50.</p>
             </div>
 
             <label for="uniquename">Unique username</label>
