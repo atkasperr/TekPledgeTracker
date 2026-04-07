@@ -26,6 +26,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			if (loginLink) loginLink.style.display = 'inline';
 			if (signupLink) signupLink.style.display = 'inline';
 		}
+
+		// If user is not authenticated and this is not a public auth page, redirect to /login
+		(function handleRedirect(u) {
+			try {
+				const path = window.location.pathname;
+				const allowed = ['/login', '/signup', '/reset-password', '/'];
+				if (!u && !allowed.includes(path)) {
+					window.location.href = '/login';
+				}
+			} catch (e) {
+				console.warn('Redirect check failed', e);
+			}
+		})(user);
 	}
 
 	try {
