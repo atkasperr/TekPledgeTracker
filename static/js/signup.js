@@ -1,5 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('signup-form');
+	const roleSelect = document.getElementById('role');
+	const pledgeFields = document.getElementById('pledge-signup-fields');
+	const tasksPerWeekInput = document.getElementById('tasks_per_week');
+
+	function syncPledgeFieldsVisibility() {
+		const isPledge = roleSelect && roleSelect.value === 'pledge';
+		if (pledgeFields) pledgeFields.style.display = isPledge ? '' : 'none';
+		if (tasksPerWeekInput) {
+			tasksPerWeekInput.disabled = !isPledge;
+			if (!isPledge) tasksPerWeekInput.value = '';
+		}
+	}
+	if (roleSelect) {
+		roleSelect.addEventListener('change', syncPledgeFieldsVisibility);
+		syncPledgeFieldsVisibility();
+	}
+
+	if (tasksPerWeekInput) {
+		tasksPerWeekInput.addEventListener('input', () => {
+			const digits = tasksPerWeekInput.value.replace(/\D/g, '');
+			tasksPerWeekInput.value = digits.slice(0, 2);
+		});
+	}
 
 	// initialize supabase client from config.js
 	const supabaseClient = typeof supabase !== 'undefined' && CONFIG ? supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY) : null;
@@ -9,6 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		const payload = {};
 		for (const [k, v] of fd.entries()) payload[k] = v;
 
+		const signupRole = payload.role;
+		if (signupRole === 'pledge') {
+			const raw = String(payload.tasks_per_week ?? '').trim();
+			if (raw !== '') {
+				const n = parseInt(raw, 10);
+				if (!Number.isFinite(n) || n < 0 || n > 50) {
+					return alert('How many times per week must be a whole number from 0 to 50.');
+				}
+				payload.tasks_per_week = String(n);
+			}
+		}
 
 		// use Supabase Auth to create the user, then create profile server-side
 		try {

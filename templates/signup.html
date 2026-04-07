@@ -19,6 +19,12 @@
                 <option value="brother">Brother</option>
             </select>
 
+            <div id="pledge-signup-fields">
+                <label for="tasks_per_week">How many times per week do you have to do your task?</label>
+                <input id="tasks_per_week" type="text" name="tasks_per_week" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="e.g. 5" aria-describedby="tasks_per_week_hint">
+                <p id="tasks_per_week_hint" class="auth-field-hint">Enter a whole number from 0 to 50.</p>
+            </div>
+
             <label for="uniquename">Unique username</label>
             <input id="uniquename" type="text" name="uniquename" placeholder="e.g. jsmith24" required>
 
