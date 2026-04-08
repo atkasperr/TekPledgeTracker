@@ -44,7 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
 				console.error('Sign in error', error);
 				return alert('Login failed: ' + (error.message || JSON.stringify(error)));
 			}
-			// on success redirect
+			// on success send access token to server to set HttpOnly session cookie
+			try {
+				const accessToken = data?.session?.access_token;
+				if (accessToken) {
+					const r = await fetch('/session', {
+						method: 'POST',
+						credentials: 'include',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ access_token: accessToken })
+					});
+					if (!r.ok) throw new Error('server session set failed');
+				}
+			} catch (e) {
+				console.warn('Could not set server session cookie', e);
+			}
 			window.location.href = '/home';
 		} catch (err) {
 			console.error('Login network/error', err);
