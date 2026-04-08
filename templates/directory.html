@@ -4,15 +4,123 @@
 
 {% block content %}
 
-<p>View the full brother directory in Google Sheets:</p>
-<a href="https://docs.google.com/spreadsheets/d/18buEhq199Y-SCD7DM-tYCjCNVEcTwfCp39JHEhET44U/edit?gid=0#gid=0" target="_blank">
-    Open Directory →
-</a>
+<h2>Directory</h2>
+<div id="directory-view">
+<div id="sheet-nav"></div>
+<div id="excel-table"></div>
 
-<p>Visit the TEK website:</p>
 <a href="https://tauepsilonkappa.com/" target="_blank">
-    TEK Website →
+    Visit TEK Website
 </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+#sheet-nav button:hover {
+  background: #005fa3;
+}
+#sheet-nav button.active {
+  background: #005fa3;
+  font-weight: bold;
+}
+a[href*="tauepsilonkappa.com"] {
+  display: inline-block;
+  margin: 20px 5px 5px 5px;
+  padding: 8px 12px;
+  background: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+a[href*="tauepsilonkappa.com"]:hover {
+  background: #005fa3;
+}
+#directory-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+#sheet-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+#excel-table th, #excel-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+#excel-table th {
+  background-color: #f2f2f2;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<div id="sheet-nav"></div>
+<div id="excel-table"></div>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('/static/files/brother_directory.xlsx');
+    if (!response.ok) throw new Error('File not found');
+    const data = await response.arrayBuffer();
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheetNames = workbook.SheetNames;
+
+    // Create navigation buttons
+    const navDiv = document.getElementById('sheet-nav');
+    let currentButton = null;
+    sheetNames.forEach(sheetName => {
+      const button = document.createElement('button');
+      button.textContent = sheetName;
+      button.addEventListener('click', () => {
+        if (currentButton) currentButton.classList.remove('active');
+        currentButton = button;
+        button.classList.add('active');
+        loadSheet(sheetName);
+      });
+      navDiv.appendChild(button);
+    });
+
+    // Load first sheet by default and highlight first button
+    if (sheetNames.length > 0) {
+      const firstButton = navDiv.querySelector('button');
+      firstButton.classList.add('active');
+      currentButton = firstButton;
+      loadSheet(sheetNames[0]);
+    }
+
+    function loadSheet(sheetName) {
+      let html = XLSX.utils.sheet_to_html(workbook.Sheets[sheetName]);
+      
+      // Remove empty rows
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const rows = tempDiv.querySelectorAll('tr');
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td, th');
+        const isEmpty = Array.from(cells).every(cell => !cell.textContent.trim());
+        if (isEmpty) row.remove();
+      });
+      html = tempDiv.innerHTML;
+      
+      document.getElementById('excel-table').innerHTML = html;
+      
+      // Adjust height to fit current sheet
+      const table = document.querySelector('#excel-table table');
+      if (table) {
+        document.getElementById('excel-table').style.height = table.offsetHeight + 'px';
+      }
+    }
+  } catch (error) {
+    document.getElementById('excel-table').innerHTML = '<p>Error loading directory: ' + error.message + '</p>';
+  }
+});
+</script>
 {% endblock %}
 
 
