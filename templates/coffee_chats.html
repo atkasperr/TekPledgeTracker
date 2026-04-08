@@ -17,6 +17,8 @@
     max-width: 1060px;
     margin: 0 auto;
     padding: 2.5rem 1.5rem;
+    position: relative;
+    z-index: 1;
     font-family: 'Roboto';
     color: #c8d8f0;
   }
@@ -461,6 +463,7 @@
 </style>
 
 <div class="cc-wrapper">
+  <canvas id="circuit-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;"></canvas>
 <div class="cc-page">
 
   <h1 class="cc-title">Coffee Chats</h1>
@@ -571,5 +574,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/static/js/coffee_chats.js"></script>
+  <script src="/static/js/circuit-background.js"></script>
+  <script src="/static/js/coffee_chats.js"></script>
 {% endblock %}

@@ -3,13 +3,21 @@
 {% block title %}Calendar{% endblock %}
 
 {% block content %}
-    <h2>Calendar</h2>
-    <div id="calendar-view">
-        <iframe src="https://calendar.google.com/calendar/embed?height=670&wkst=1&ctz=America%2FNew_York&showPrint=0&src=Y181NmUwNmZjMTZlYmY5NjUzNTcwZTlmMjAzZGE0ZDU3MDc4OGIzN2FmMzRjZDBiYWU1MDJkMDU5YTQ3N2VkYWMyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23ad1457" 
-            style="border:solid 1px #777" width="1000" height="670" frameborder="0" scrolling="no"></iframe>
+    <div id="calendar-container" style="position:relative; min-height:700px;">
+        <canvas id="circuit-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;"></canvas>
+        <div id="calendar-view" style="position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:12px; padding-top:18px;">
+            <h2 style="position:relative; z-index:3; color:#e8edf5; margin:0;">Calendar</h2>
+            <div style="width:100%; display:flex; justify-content:center;">
+                <div style="max-width:900px; width:100%; box-sizing:border-box;">
+                    <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FNew_York&showPrint=0&src=Y181NmUwNmZjMTZlYmY5NjUzNTcwZTlmMjAzZGE0ZDU3MDc4OGIzN2FmMzRjZDBiYWU1MDJkMDU5YTQ3N2VkYWMyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23ad1457" 
+                        style="border:solid 1px #777; width:100%; height:600px; display:block;" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
+    <script src="/static/js/circuit-background.js"></script>
     <script src="/static/js/calendar.js"></script>
 {% endblock %}
