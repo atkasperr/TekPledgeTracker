@@ -36,14 +36,14 @@ body {
     font-size: 12px;
     flex-wrap: wrap;
     align-items: center;
-    font-family: 'Orbitron', monospace; /* Added font-family */
+    font-family: 'Roboto', sans-serif; /* Added font-family */
 }
 
 .auth-status {
     margin-left: auto;
     color: #000;
     font-size: 12px;
-    font-family: 'Orbitron', monospace; /* Added font-family */
+    font-family: 'Roboto', sans-serif; /* Added font-family */
 }
 
 .logout-btn {
