@@ -13,15 +13,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
+
+	// Helper to fetch server session using HttpOnly cookie
+
+	async function fetchServerSession() {
+		try {
+			const r = await fetch('/session', { credentials: 'include' });
+			if (!r.ok) return null;
+			const body = await r.json();
+			return body.user || null;
+		} catch (e) {
+			console.warn('Could not fetch server session', e);
+			return null;
+		}
+	}
+
 	function renderUser(user) {
 		if (!authStatusEl || !logoutBtn) return;
 		if (user) {
-			authStatusEl.textContent = `Logged in: ${user.email || user.id}`;
+			if (typeof user === 'object' && (user.email || user.id)) {
+				authStatusEl.textContent = `Logged in: ${user.email || user.id}`;
+			} else {
+				authStatusEl.textContent = 'Logged in';
+			}
 			logoutBtn.style.display = 'inline-block';
 			if (loginLink) loginLink.style.display = 'none';
 			if (signupLink) signupLink.style.display = 'none';
 		} else {
-			authStatusEl.textContent = 'Not logged in';
+			// show nothing when not authenticated (and allow redirect to handle auth flow)
+			authStatusEl.textContent = '';
 			logoutBtn.style.display = 'none';
 			if (loginLink) loginLink.style.display = 'inline';
 			if (signupLink) signupLink.style.display = 'inline';
@@ -41,21 +61,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 		})(user);
 	}
 
-	try {
-		const { data, error } = await supabaseClient.auth.getUser();
-		if (error) {
-			console.warn('Unable to fetch current user', error);
-			renderUser(null);
-		} else {
-			renderUser(data.user);
-		}
-	} catch (err) {
-		console.error('Auth status check failed', err);
+	// Ask server for current session (uses HttpOnly cookie set by /session)
+	const serverUser = await fetchServerSession();
+	if (serverUser) {
+		renderUser(serverUser);
+	} else {
+		// No server session — treat as unauthenticated. Avoid querying Supabase from the client.
 		renderUser(null);
 	}
 
 	supabaseClient.auth.onAuthStateChange((_event, session) => {
-		renderUser(session ? session.user : null);
+		// When client auth state changes, inform server to set/clear HttpOnly cookie
+		(async () => {
+			try {
+				if (session && session.access_token) {
+					await fetch('/session', {
+						method: 'POST',
+						credentials: 'include',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ access_token: session.access_token })
+					});
+				} else {
+					await fetch('/logout', { method: 'POST', credentials: 'include' });
+				}
+			} catch (e) {
+				/* ignore */
+			}
+			renderUser(session ? session.user : null);
+		})();
 	});
 
 	logoutBtn?.addEventListener('click', async () => {
@@ -67,6 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 			alert('Logout failed: ' + (error.message || JSON.stringify(error)));
 			return;
 		}
-		window.location.href = '/';
+		try {
+			await fetch('/logout', { method: 'POST', credentials: 'include' });
+		} catch (e) { /* ignore */ }
+		window.location.href = '/login';
 	});
 });

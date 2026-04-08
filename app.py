@@ -2,6 +2,8 @@ import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from dotenv import load_dotenv
 from supabase import create_client
+import base64
+import json
 from postgrest.exceptions import APIError
 
 load_dotenv()
@@ -15,6 +17,23 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError('SUPABASE_URL and SUPABASE_KEY must be set in the environment')
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+def parse_jwt_payload(token):
+    """Parse JWT payload without verification. Returns dict or None."""
+    if not token or '.' not in token:
+        return None
+    try:
+        parts = token.split('.')
+        payload_b64 = parts[1]
+        # pad base64
+        padding = '=' * (-len(payload_b64) % 4)
+        payload_b64 += padding
+        payload_bytes = base64.urlsafe_b64decode(payload_b64.encode('utf-8'))
+        payload = json.loads(payload_bytes.decode('utf-8'))
+        return payload
+    except Exception:
+        return None
 
 
 @app.context_processor
@@ -33,6 +52,75 @@ def index():
 @app.route('/login')
 def login():
     return render_template('login.html', hide_navbar=True)
+
+
+@app.route('/session', methods=['POST', 'GET'])
+def session_endpoint():
+    # POST: receive access_token and set HttpOnly cookie
+    if request.method == 'POST':
+        payload = request.get_json() or {}
+        token = payload.get('access_token')
+        if not token:
+            return jsonify({'status': 'error', 'message': 'missing access_token'}), 400
+        parsed = parse_jwt_payload(token)
+        if not parsed:
+            return jsonify({'status': 'error', 'message': 'invalid token'}), 401
+        # build minimal user info from token payload
+        user = {
+            'id': parsed.get('sub') or parsed.get('user_id') or parsed.get('id'),
+            'email': parsed.get('email')
+        }
+        resp = jsonify({'status': 'ok', 'user': user})
+        secure_flag = not app.debug
+        resp.set_cookie('sb_access_token', token, httponly=True, secure=secure_flag, samesite='Lax', max_age=24*60*60)
+        return resp
+
+    # GET: return current user info based on HttpOnly cookie
+    token = request.cookies.get('sb_access_token')
+    if not token:
+        return jsonify({'user': None}), 200
+    parsed = parse_jwt_payload(token)
+    if not parsed:
+        resp = jsonify({'user': None})
+        resp.delete_cookie('sb_access_token')
+        return resp, 200
+    user = {
+        'id': parsed.get('sub') or parsed.get('user_id') or parsed.get('id'),
+        'email': parsed.get('email')
+    }
+    return jsonify({'user': user}), 200
+
+
+@app.route('/logout', methods=['POST', 'GET'])
+def logout():
+    # Clear the HttpOnly cookie and redirect to login
+    resp = redirect(url_for('login'))
+    resp.delete_cookie('sb_access_token')
+    return resp
+
+
+@app.route('/api/my-pledge', methods=['GET'])
+def api_my_pledge():
+    # Return the pledge row for the current user based on HttpOnly session cookie
+    token = request.cookies.get('sb_access_token')
+    if not token:
+        return jsonify({'pledge': None}), 200
+    parsed = parse_jwt_payload(token)
+    if not parsed:
+        resp = jsonify({'pledge': None})
+        resp.delete_cookie('sb_access_token')
+        return resp, 200
+    email = parsed.get('email')
+    if not email:
+        return jsonify({'pledge': None}), 200
+    try:
+        res = supabase.table('pledges').select('*').eq('email', email).limit(1).execute()
+        data = getattr(res, 'data', res)
+        if data and isinstance(data, list) and len(data) > 0:
+            return jsonify({'pledge': data[0]}), 200
+        return jsonify({'pledge': None}), 200
+    except Exception as e:
+        return jsonify({'pledge': None, 'error': str(e)}), 200
 
 
 @app.route('/signup')

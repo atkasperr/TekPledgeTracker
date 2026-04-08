@@ -547,21 +547,13 @@
   };
 
   async function applyPledgeTasksPerWeekFromProfile() {
-    if (typeof supabase === 'undefined' || typeof CONFIG === 'undefined' || !CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_KEY) {
-      return;
-    }
     try {
-      const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-      const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
-      if (userErr || !userData?.user?.email) return;
-      const { data: rows, error: pledgeErr } = await supabaseClient
-        .from('pledges')
-        .select('tasks_per_week')
-        .eq('email', userData.user.email)
-        .limit(1);
-      if (pledgeErr || !rows || !rows.length) return;
-      const pledgeRow = rows[0];
-      const n = pledgeRow.tasks_per_week;
+      const r = await fetch('/api/my-pledge', { credentials: 'include' });
+      if (!r.ok) return;
+      const body = await r.json().catch(() => ({}));
+      const pledge = body.pledge;
+      if (!pledge) return;
+      const n = pledge.tasks_per_week;
       if (n == null || n === '') return;
       const parsed = Number(n);
       if (!Number.isFinite(parsed) || parsed < 0) return;
