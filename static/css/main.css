@@ -36,12 +36,14 @@ body {
     font-size: 12px;
     flex-wrap: wrap;
     align-items: center;
+    font-family: 'Orbitron', monospace; /* Added font-family */
 }
 
 .auth-status {
     margin-left: auto;
     color: #000;
     font-size: 12px;
+    font-family: 'Orbitron', monospace; /* Added font-family */
 }
 
 .logout-btn {
@@ -95,6 +97,7 @@ body {
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.6px;
+    font-family: 'Roboto';
     text-shadow:
         0 0 8px rgba(255, 255, 255, 0.85),
         0 0 20px rgba(174, 218, 255, 0.45);
