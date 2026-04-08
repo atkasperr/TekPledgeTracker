@@ -5,22 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	const chatsSemesterEl = document.getElementById('chats-semester');
 
 	async function getCurrentPledgeUniq() {
-		if (typeof supabase === 'undefined' || typeof CONFIG === 'undefined') return null;
 		try {
-			const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-			const { data: userData } = await supabaseClient.auth.getUser();
-			const user = userData?.user;
-			if (!user || !user.email) return null;
-			const { data: pledgeData, error: pledgeErr } = await supabaseClient
-				.from('pledges')
-				.select('uniquename')
-				.eq('email', user.email)
-				.limit(1)
-				.single();
-			if (pledgeErr || !pledgeData) return null;
-			return pledgeData.uniquename || null;
-		} catch (err) {
-			console.warn('Error getting current pledge uniq', err);
+			const r = await fetch('/api/my-pledge', { credentials: 'include' });
+			if (!r.ok) return null;
+			const body = await r.json().catch(() => ({}));
+			const pledge = body.pledge;
+			if (!pledge) return null;
+			return pledge.uniquename || pledge.uniquename || null;
+		} catch (e) {
+			console.warn('Error getting current pledge uniq', e);
 			return null;
 		}
 	}
@@ -210,21 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		const payload = {};
 		for (const [k, v] of formData.entries()) payload[k] = v;
 
-		if (!payload.pledge_uniq && typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined') {
+		if (!payload.pledge_uniq) {
 			try {
-				const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-				const { data: userData } = await supabaseClient.auth.getUser();
-				const user = userData?.user;
-				if (user && user.email) {
-					const { data: pledgeData, error: pledgeErr } = await supabaseClient
-						.from('pledges')
-						.select('uniquename')
-						.eq('email', user.email)
-						.limit(1)
-						.single();
-					if (!pledgeErr && pledgeData?.uniquename) {
-						payload.pledge_uniq = pledgeData.uniquename;
-					}
+				const r = await fetch('/api/my-pledge', { credentials: 'include' });
+				if (r.ok) {
+					const body = await r.json().catch(() => ({}));
+					if (body.pledge && body.pledge.uniquename) payload.pledge_uniq = body.pledge.uniquename;
 				}
 			} catch (err) {
 				console.warn('Error deriving pledge_uniq', err);
