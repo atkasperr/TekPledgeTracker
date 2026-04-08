@@ -322,6 +322,125 @@
     text-align: center;
     padding: 1rem 0;
   }
+
+  /* Leaderboard */
+  .leaderboard-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .leaderboard-card {
+    background: #0d1b2e;
+    border: 1px solid rgba(41,120,180,0.2);
+    border-left: 4px solid #f59e0b;
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+  }
+
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: #c8d8f0;
+  }
+
+  .leaderboard-table thead tr {
+    border-bottom: 1px solid rgba(41,120,180,0.2);
+  }
+
+  .leaderboard-table th {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a6a8a;
+    padding: 0 0 0.75rem;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .leaderboard-table td {
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(41,120,180,0.1);
+    color: #c8d8f0;
+  }
+
+  .leaderboard-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .leaderboard-table tbody tr:hover {
+    background: rgba(245,158,11,0.05);
+    cursor: default;
+  }
+
+  .leaderboard-table tbody tr td:first-child {
+    color: #4a6a8a;
+    font-size: 0.72rem;
+    width: 2.5rem;
+  }
+
+  .leaderboard-count {
+    color: #f59e0b !important;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .leaderboard-tooltip {
+    position: absolute;
+    z-index: 9999;
+    background: #0d1b2e;
+    border: 1px solid rgba(41,120,180,0.3);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: #c8d8f0;
+    max-width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    pointer-events: none;
+    display: none;
+  }
+
+  .leaderboard-tooltip h4 {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #f59e0b;
+    margin: 0 0 0.75rem;
+  }
+
+  .leaderboard-tooltip ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .leaderboard-tooltip li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(41,120,180,0.1);
+    font-size: 0.72rem;
+  }
+
+  .leaderboard-tooltip li:last-child { border-bottom: none; }
+
+  .leaderboard-tooltip li strong {
+    color: #ffffff;
+    display: block;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+  }
+
+  .leaderboard-tooltip .chat-date {
+    color: #4a6a8a;
+    font-size: 0.65rem;
+  }
+
+  .leaderboard-tooltip li div {
+    color: #4a6a8a;
+    font-size: 0.65rem;
+    margin-top: 0.1rem;
+  }
 </style>
 
 <div class="cc-wrapper">
@@ -396,7 +515,6 @@
     </form>
   </div>
 
-</div>
 
   <!-- Recent Chats Card -->
   <div class="cc-recent-card">
@@ -409,19 +527,10 @@
     </div>
   </div>
 
-</div>
-
-</div> <!-- end cc-wrapper -->
-
-<!-- Hidden spans kept for JS compatibility -->
-<div style="display:none">
-  <span id="chats-semester">0</span>
-  <span id="progress-35-text">0 / 35</span>
-  <span id="progress-4-text">0 / 4</span>
-</div>
-
-    <div id="leaderboard" class="leaderboard">
-        <h3>Leaderboard</h3>
+  <!-- Leaderboard -->
+  <div id="leaderboard" class="leaderboard-section">
+      <p class="cc-form-title">Leaderboard</p>
+      <div class="leaderboard-card">
         <table class="leaderboard-table">
             <thead>
                 <tr><th>#</th><th>Pledge</th><th>Chats</th></tr>
@@ -430,7 +539,18 @@
                 <!-- rows rendered here -->
             </tbody>
         </table>
-    </div>
+      </div>
+  </div>
+
+</div> <!-- end cc-page -->
+</div> <!-- end cc-wrapper -->
+
+<!-- Hidden spans kept for JS compatibility -->
+<div style="display:none">
+  <span id="chats-semester">0</span>
+  <span id="progress-35-text">0 / 35</span>
+  <span id="progress-4-text">0 / 4</span>
+</div>
 {% endblock %}
 
 {% block scripts %}
